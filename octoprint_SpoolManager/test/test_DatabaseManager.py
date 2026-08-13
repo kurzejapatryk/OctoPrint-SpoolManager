@@ -1,197 +1,126 @@
+# coding=utf-8
 # SPDX-FileCopyrightText: Copyright (c) OllisGit
 # SPDX-FileCopyrightText: Copyright (c) 2026 Patryk Kurzeja
 # SPDX-License-Identifier: AGPL-3.0-only
+
+import logging
 import os
-import pprint
+import shutil
+import tempfile
 import unittest
 
-from octoprint_SpoolManager import DatabaseManager, SpoolManagerAPI
-import logging
-
+from octoprint_SpoolManager.DatabaseManager import DatabaseManager
 from octoprint_SpoolManager.models.SpoolModel import SpoolModel
+
+
+def _env(key, default=None):
+	"""Return the environment variable value, or the default when unset."""
+	value = os.environ.get(key)
+	return value if value is not None else default
+
 
 class TestDatabase(unittest.TestCase):
 
-	sqliteDatabaseSettings = DatabaseManager.DatabaseSettings()
-	sqliteDatabaseSettings.useExternal = False
-	sqliteDatabaseSettings.baseFolder = "/Users/o0632/Library/Application Support/OctoPrint/data/SpoolManager/"
+	@classmethod
+	def setUpClass(cls):
+		cls._tempFolder = tempfile.mkdtemp(prefix="spoolmanager-test-")
+		logging.basicConfig(level=logging.INFO)
 
-	postgresDatabaseSettings = DatabaseManager.DatabaseSettings()
-	postgresDatabaseSettings.type = "postgres"
-	postgresDatabaseSettings.host = "localhost"
-	postgresDatabaseSettings.port = 5432
-	postgresDatabaseSettings.name = "spoolmanagerdb"
-	postgresDatabaseSettings.user = "Olli"
-	postgresDatabaseSettings.password = "illO"
-
-	mysqlDatabaseSettings = DatabaseManager.DatabaseSettings()
-	mysqlDatabaseSettings.type = "mysql"
-	mysqlDatabaseSettings.host = "localhost"
-	mysqlDatabaseSettings.port = 3306
-	mysqlDatabaseSettings.name = "spoolmanagerdb"
-	mysqlDatabaseSettings.user = "Olli"
-	mysqlDatabaseSettings.password = "illO"
-
-
-	def setUp(self):
-		self.init_database()
+	@classmethod
+	def tearDownClass(cls):
+		shutil.rmtree(cls._tempFolder, ignore_errors=True)
 
 	def _clientOutput(self, type, title, message):
-		print("**********************************************")
-		print("Type:"+type)
-		print("Title:"+title)
-		print("Message:"+message)
-		print("**********************************************")
+		print("CLIENT-MESSAGE [%s] %s: %s" % (type, title, message))
 
-	def init_database(self):
-		logging.basicConfig(level=logging.DEBUG)
-		self.testLogger = logging.getLogger("testLogger")
-		logging.info("Start Database-Test")
-		self.databaseManager = DatabaseManager(self.testLogger, True)
+	def _newDatabaseManager(self):
+		return DatabaseManager(logging.getLogger("test"), sqlLoggingEnabled=False)
 
-		# databaseSettings = {
-		# 	"type": "postgres",
-		# 	"host": "localhost",
-		# 	"port": 5432,
-		# 	"databaseName": "spoolmanagerdb",
-		# 	"user": "Olli",
-		# 	"password": "illO"
-		# }
-		#
-		# self.databaseManager.initDatabase(self.databaselocation, databaseSettings, self._clientOutput)
+	def _buildSqliteSettings(self):
+		settings = DatabaseManager.DatabaseSettings()
+		settings.useExternal = False
+		settings.baseFolder = self._tempFolder
+		return settings
 
-	##################################################################################################   SQLITE CONNECTION
-	def _test_connectToSQLite(self):
-		self.testLogger.info("--------------------- SQLITE CONNECTION")
-		self.databaseManager.initDatabase(self.sqliteDatabaseSettings, self._clientOutput)
-		self.assertTrue( self.databaseManager.testDatabaseConnection() == None, "No Database connection")
-		self.testLogger.info("--------------------- SQLITE CONNECTION - DONE")
+	def _buildPostgresSettings(self):
+		settings = DatabaseManager.DatabaseSettings()
+		settings.useExternal = True
+		settings.type = "postgres"
+		settings.host = _env("SPOOLMANAGER_TEST_PG_HOST", "localhost")
+		settings.port = int(_env("SPOOLMANAGER_TEST_PG_PORT", "5432"))
+		settings.name = _env("SPOOLMANAGER_TEST_PG_NAME", "spoolmanagerdb")
+		settings.user = _env("SPOOLMANAGER_TEST_PG_USER", "Olli")
+		settings.password = _env("SPOOLMANAGER_TEST_PG_PASSWORD", "illO")
+		return settings
 
-	##################################################################################################   POSTGRES CONNECTION
-	def _test_connectToPostgres(self):
-		self.testLogger.info("--------------------- POSTGRESS CONNECTION")
-		self.databaseManager.initDatabase(self.postgresDatabaseSettings, self._clientOutput)
-		self.assertTrue(self.databaseManager.testDatabaseConnection() == None, "No Database connection")
-		self.testLogger.info("--------------------- POSTGRESS CONNECTION - DONE")
+	def _buildMysqlSettings(self):
+		settings = DatabaseManager.DatabaseSettings()
+		settings.useExternal = True
+		settings.type = "mysql"
+		settings.host = _env("SPOOLMANAGER_TEST_MYSQL_HOST", "localhost")
+		settings.port = int(_env("SPOOLMANAGER_TEST_MYSQL_PORT", "3306"))
+		settings.name = _env("SPOOLMANAGER_TEST_MYSQL_NAME", "spoolmanagerdb")
+		settings.user = _env("SPOOLMANAGER_TEST_MYSQL_USER", "Olli")
+		settings.password = _env("SPOOLMANAGER_TEST_MYSQL_PASSWORD", "illO")
+		return settings
 
-	##################################################################################################   MYSQL CONNECTION
-	def _test_connectToMySQL(self):
-		self.testLogger.info("--------------------- MYSQL CONNECTION")
-		self.databaseManager.initDatabase(self.mysqlDatabaseSettings, self._clientOutput)
-		self.databaseManager.connectoToDatabase()
-		self.assertTrue(self.databaseManager.testDatabaseConnection() == None, "No Database connection")
-		self.testLogger.info("--------------------- MYSQL CONNECTION - DONE")
+	def _exerciseCrud(self, settings):
+		manager = self._newDatabaseManager()
+		manager.initDatabase(settings, self._clientOutput)
+		self.assertIsNone(manager.testDatabaseConnection(), "Database connection failed")
 
-	##################################################################################################   LOAD META DATA
-	def _test_readMetadata(self):
+		spool = SpoolModel()
+		spool.displayName = "TEST-SPOOL-%s" % os.getpid()
+		spool.material = "ABS"
+		spool.vendor = "TestVendor"
+		spool.totalWeight = 1000.0
+		databaseId = manager.saveSpool(spool)
+		self.assertIsNotNone(databaseId, "Spool not saved")
 
-		self.databaseManager.initDatabase(self.sqliteDatabaseSettings, self._clientOutput)
-		# self.databaseManager.initDatabase(self.postgresDatabaseSettings, self._clientOutput)
-		# self.databaseManager.initDatabase(self.mysqlDatabaseSettings, self._clientOutput)
-		metadata = self.databaseManager.loadDatabaseMetaInformations()
-		print(metadata)
+		loaded = manager.loadSpool(databaseId)
+		self.assertIsNotNone(loaded, "Spool not loaded")
+		self.assertEqual("TEST-SPOOL-%s" % os.getpid(), loaded.displayName)
+		self.assertEqual("ABS", loaded.material)
 
-	##################################################################################################   CREATE DATABASE
-	def _test_createDatabase(self):
+		count = manager.countSpoolsByQuery()
+		self.assertGreaterEqual(count, 1, "Expected at least one spool")
 
-		self.databaseManager.initDatabase(self.postgresDatabaseSettings, self._clientOutput)
-		self.databaseManager.reCreateDatabase(self.postgresDatabaseSettings)
-		metadata = self.databaseManager.loadDatabaseMetaInformations()
-		print(metadata)
-		allSpoolModels = self.databaseManager.loadAllSpoolsByQuery()
-		self.assertEqual( 0, len(allSpoolModels), "Database not reCreated. Still spools inside")
+		deletedId = manager.deleteSpool(databaseId)
+		self.assertEqual(databaseId, deletedId, "Spool not deleted")
 
-	##################################################################################################   REUSABEL CONNECTION
-	def _test_handleReusableConnectionl(self):
+		manager.closeDatabase()
 
-		self.databaseManager.initDatabase(self.postgresDatabaseSettings, self._clientOutput)
-		self.databaseManager.connectoToDatabase()
-		spool = self.databaseManager.loadSpool(1, withReusedConnection=True)
-		import time
-		time.sleep(3)
-		print(spool.displayName)
+	def test_sqlite_connect(self):
+		manager = self._newDatabaseManager()
+		manager.initDatabase(self._buildSqliteSettings(), self._clientOutput)
+		self.assertIsNone(manager.testDatabaseConnection(), "SQLite connection failed")
+		manager.closeDatabase()
 
-		allSpoolModels = self.databaseManager.loadAllSpoolsByQuery(withReusedConnection=True)
-		print(len(allSpoolModels))
-		import time
-		time.sleep(3)
+	def test_sqlite_crud(self):
+		self._exerciseCrud(self._buildSqliteSettings())
 
-		if (allSpoolModels != None):
-			for spoolModel in allSpoolModels:
-				print(spoolModel.displayName)
+	@unittest.skipUnless(_env("SPOOLMANAGER_TEST_POSTGRES"), "Set SPOOLMANAGER_TEST_POSTGRES=1 to run PostgreSQL tests")
+	def test_postgres_connect(self):
+		manager = self._newDatabaseManager()
+		manager.initDatabase(self._buildPostgresSettings(), self._clientOutput)
+		self.assertIsNone(manager.testDatabaseConnection(), "PostgreSQL connection failed")
+		manager.closeDatabase()
 
+	@unittest.skipUnless(_env("SPOOLMANAGER_TEST_POSTGRES"), "Set SPOOLMANAGER_TEST_POSTGRES=1 to run PostgreSQL tests")
+	def test_postgres_crud(self):
+		self._exerciseCrud(self._buildPostgresSettings())
 
-		self.databaseManager.closeDatabase()
+	@unittest.skipUnless(_env("SPOOLMANAGER_TEST_MYSQL"), "Set SPOOLMANAGER_TEST_MYSQL=1 to run MySQL tests")
+	def test_mysql_connect(self):
+		manager = self._newDatabaseManager()
+		manager.initDatabase(self._buildMysqlSettings(), self._clientOutput)
+		self.assertIsNone(manager.testDatabaseConnection(), "MySQL connection failed")
+		manager.closeDatabase()
 
-	##################################################################################################   LOAD SINGLE SPOOL
-	def test_loadSingleSpool(self):
-
-		self.databaseManager.initDatabase(self.sqliteDatabaseSettings, self._clientOutput)
-		spool = self.databaseManager.loadSpool("9")
-		# import time
-		# time.sleep(3)
-		print(spool.displayName)
-
-	##################################################################################################   LOAD ALL SPOOLS
-	def _test_loadAllSpools(self):
-
-		self.databaseManager.initDatabase(self.sqliteDatabaseSettings, self._clientOutput)
-
-		tableQuery = {
-			"from": 0,
-			"to": 100,
-			"sortColumn": "remaining",
-			"sortOrder": "asc",
-			"filterName": "all",
-			"materialFilter": "ABS,PLA",
-			"vendorFilter": "all",
-			"colorFilter": "#ff0000;red,#ff0000;keinRot"
-		}
-
-		allSpoolModels = self.databaseManager.loadAllSpoolsByQuery(tableQuery)
-		print(len(allSpoolModels))
-		# import time
-		# time.sleep(3)
-
-		if (allSpoolModels != None):
-			for spoolModel in allSpoolModels:
-				displayName = spoolModel.displayName
-				remainingWeight = str(spoolModel.remainingWeight)
-				color = spoolModel.color + " " + spoolModel.colorName
-				material = spoolModel.material
-				print("Spool:'"+ displayName + "' Color:'" + color + "' Material:'"+material+"'")
-
-	##################################################################################################   SAVE SPOOL
-	def _test_saveSpool(self):
-		spoolModel = SpoolModel()
-		spoolModel.displayName = "TESTSPOOL - Number1"
-
-		self.databaseManager.initDatabase(self.postgresDatabaseSettings, self._clientOutput)
-		databaseId = self.databaseManager.saveSpool(spoolModel)
-		print(databaseId)
-		self.assertTrue( databaseId != None, "Spool not saved")
-
-		spoolModel = self.databaseManager.loadSpool(databaseId)
-		self.assertTrue(spoolModel != None, "Spool not loaded")
-		self.assertEqual("TESTSPOOL - Number1", spoolModel.displayName, "Spool not saved")
-
-	##################################################################################################   DELETE SPOOL
-	def _test_deleteSpool(self):
-		self.databaseManager.initDatabase(self.postgresDatabaseSettings, self._clientOutput)
-		databaseId = 3
-		print(databaseId)
-
-		deletedDatabaseId = self.databaseManager.deleteSpool(databaseId)
-		self.assertEqual(databaseId, deletedDatabaseId, "Spool not deleted")
-
-
-	##################################################################################################   DELETE SPOOL
-	def _test_materialModels(self):
-		self.databaseManager.initDatabase(self.sqliteDatabaseSettings, self._clientOutput)
-
+	@unittest.skipUnless(_env("SPOOLMANAGER_TEST_MYSQL"), "Set SPOOLMANAGER_TEST_MYSQL=1 to run MySQL tests")
+	def test_mysql_crud(self):
+		self._exerciseCrud(self._buildMysqlSettings())
 
 
 if __name__ == '__main__':
-	print("Start DatabaseManager Test")
 	unittest.main()
-	print("Finished")
