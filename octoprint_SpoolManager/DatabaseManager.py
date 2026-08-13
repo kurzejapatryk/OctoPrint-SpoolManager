@@ -116,14 +116,16 @@ class DatabaseManager(object):
 		schemeVersionFromDatabaseModel = None
 		schemeVersionFromDatabase = None
 		try:
-			cursor = self.db.execute_sql('select "value" from "spo_pluginmetadatamodel" where key="'+PluginMetaDataModel.KEY_DATABASE_SCHEME_VERSION+'";')
-			result = cursor.fetchone()
-			if (result != None):
-				schemeVersionFromDatabase = int(result[0])
+			# use the ORM instead of raw SQL, so the query stays portable
+			# across SQLite, PostgreSQL and MySQL
+			schemeVersionFromDatabaseModel = PluginMetaDataModel.get_or_none(
+				PluginMetaDataModel.key == PluginMetaDataModel.KEY_DATABASE_SCHEME_VERSION)
+			if (schemeVersionFromDatabaseModel != None):
+				schemeVersionFromDatabase = int(schemeVersionFromDatabaseModel.value)
 				self._logger.info("Current databasescheme: " + str(schemeVersionFromDatabase))
 			else:
 				self._logger.warn("Strange, table is found (maybe), but there is no result of the schem version. Try to recreate a new db-scheme")
-				self.backupDatabaseFile() # safty first
+				self.backupDatabaseFile() # safety first
 				self._createDatabaseTables()
 				return
 			pass
@@ -801,7 +803,7 @@ class DatabaseManager(object):
 		finally:
 			try:
 				if (withReusedConnection == False):
-					self._closeDatabase()
+					self.closeDatabase()
 			except:
 				pass # do nothing
 		pass
