@@ -38,7 +38,7 @@ class DatabaseManager(object):
 		fileLocation = ""
 		# External stuff
 		useExternal = False
-		type = "postgresql" # postgresql,  mysql NOT sqlite
+		type = "postgres" # postgres,  mysql
 		name = ""
 		host = ""
 		port = 0
@@ -71,29 +71,31 @@ class DatabaseManager(object):
 	def _buildDatabaseConnection(self):
 		database = None
 		if (self._databaseSettings.useExternal == False):
-			# local database`
+			# local database
 			database = SqliteDatabase(self._databaseSettings.fileLocation)
 		else:
-			databaseType = self._databaseSettings.type
+			databaseType = (self._databaseSettings.type or "").strip().lower()
 			databaseName = self._databaseSettings.name
 			host = self._databaseSettings.host
 			port = self._databaseSettings.port
 			user = self._databaseSettings.user
 			password = self._databaseSettings.password
-			if ("postgres" == databaseType):
+			if (databaseType in ("postgres", "postgresql")):
 				# Connect to a Postgres database.
 				database = PostgresqlDatabase(databaseName,
-												   	user=user,
-												   	password=password,
-										   		   	host=host,
-												   	port=port)
-			else:
-				# Connect to a MySQL database on network.
+						user=user,
+						password=password,
+						host=host,
+						port=port)
+			elif (databaseType in ("mysql", "mariadb")):
+				# Connect to a MySQL/MariaDB database on network.
 				database = MySQLDatabase(databaseName,
-											   user=user,
-											   password=password,
-											   host=host,
-											   port=port)
+						user=user,
+						password=password,
+						host=host,
+						port=port)
+			else:
+				raise Exception("Unsupported external database type '" + str(databaseType) + "'. Supported: 'postgres', 'mysql'.")
 
 		return database
 

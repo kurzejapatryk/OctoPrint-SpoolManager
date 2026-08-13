@@ -40,9 +40,9 @@ plugin_license = "AGPL-3.0-only"
 plugin_requires = [
 	"pillow >=6.2.0<7.0.0", # since 7.0.0 no Python 2.7 Support, see https://github.com/python-pillow/Pillow/blob/master/CHANGES.rst
 	"qrcode",
-	"peewee"
-	# "psycopg2-binary",  # postgres - driver
-	# "pymysql",	#mysql - driver
+	"peewee",
+	"psycopg2-binary",  # postgres - driver
+	"pymysql",  # mysql - driver
 ]
 
 ### --------------------------------------------------------------------------------------------------------------------

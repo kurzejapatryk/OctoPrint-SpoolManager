@@ -820,8 +820,7 @@ class SpoolmanagerPlugin(
 		settings[SettingsKeys.SETTINGS_KEY_DATABASE_USE_EXTERNAL] = False
 		datbaseLocation = DatabaseManager.buildDefaultDatabaseFileLocation(self.get_plugin_data_folder())
 		settings[SettingsKeys.SETTINGS_KEY_DATABASE_LOCAL_FILELOCATION] = datbaseLocation
-		settings[SettingsKeys.SETTINGS_KEY_DATABASE_TYPE] = "sqlite"
-		# settings[SettingsKeys.SETTINGS_KEY_DATABASE_TYPE] = "postgres"
+		settings[SettingsKeys.SETTINGS_KEY_DATABASE_TYPE] = "postgres"
 		settings[SettingsKeys.SETTINGS_KEY_DATABASE_HOST] = "localhost"
 		settings[SettingsKeys.SETTINGS_KEY_DATABASE_PORT] = 5432
 		settings[SettingsKeys.SETTINGS_KEY_DATABASE_NAME] = "SpoolDatabase"
