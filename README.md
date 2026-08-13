@@ -47,7 +47,7 @@ If you like it, I would be thankful about a cup of coffee :)
 - [X] Support for manual mid-print filament change
 
 ## Planning / next features
-- [ ] External Database (IN PROGRESS)
+- [X] External Database (PostgreSQL / MySQL / MariaDB)
 - [ ] PrintJobHistory integration [PrintJobHistory-Plugin](https://github.com/OllisGit/OctoPrint-PrintJobHistory)
 - [ ] Capture Spool-Image
 - [ ] ...more planing details could be found [here](https://github.com/OllisGit/OctoPrint-SpoolManager/projects/1)
@@ -85,6 +85,41 @@ Changing between each release is done via the "Software Update section" in the s
 Hint: "Easy-switching" is possible with OctoPrint-Version 1.8.0 (see https://github.com/OctoPrint/OctoPrint/issues/4238).
 At the meantime you need to uninstall and install the version you like from the selected channel...or stay in one channel ;-)
 
+
+## External Database (shared database for multiple printers)
+
+This fork finishes the external database support so that a single shared database can be used by
+multiple OctoPrint instances.
+
+Supported backends:
+- Local **SQLite** (default) — no configuration needed.
+- **PostgreSQL** — requires the `psycopg2-binary` driver.
+- **MySQL / MariaDB** — requires the `pymysql` driver.
+
+### Setup
+
+1. Run a database server. A ready-made setup for both databases is provided in
+   [`docker-compose.yml`](docker-compose.yml):
+
+   ```
+   docker compose up -d postgres mysql
+   ```
+
+   Default connection settings used by that compose file:
+   - host: `localhost`, port: `5432` (PostgreSQL) / `3306` (MySQL)
+   - database: `spoolmanagerdb`, user: `Olli`, password: `illO`
+
+2. In OctoPrint, open **Settings → Spool Manager → Storage**, select **Use external database**,
+   choose the database type and fill in the connection details, then press **Test connection**.
+
+3. Press **ReCreate database** once to create the schema in the external database.
+
+### Notes for multi-printer setups
+
+- All instances must run the **same plugin version** (the database schema version must match).
+- Every OctoPrint instance points at the same external database; changes made on one printer
+  become visible on the others after pressing **Reload** in the Spool Manager tab.
+- The local SQLite database is **not** shared — only the external database is.
 
 ## Versions
 
