@@ -11,3 +11,7 @@ dist
 
 # Local agent rules (personal, not published)
 AGENTS.md
+
+# Agent tooling artifacts (local)
+.agents/
+skills-lock.json
