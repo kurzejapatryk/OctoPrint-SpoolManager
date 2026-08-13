@@ -1,4 +1,7 @@
 # coding=utf-8
+# SPDX-FileCopyrightText: Copyright (c) OllisGit
+# SPDX-FileCopyrightText: Copyright (c) 2026 Patryk Kurzeja
+# SPDX-License-Identifier: AGPL-3.0-only
 
 ########################################################################################################################
 ### Do not forget to adjust the following variables to your own plugin.
@@ -31,7 +34,7 @@ plugin_author_email = "ollisgit@gmail.com"
 plugin_url = "https://github.com/OllisGit/OctoPrint-SpoolManager"
 
 # The plugin's license. Can be overwritten within OctoPrint's internal data via __plugin_license__ in the plugin module
-plugin_license = "AGPLv3"
+plugin_license = "AGPL-3.0-only"
 
 # Any additional requirements besides OctoPrint should be listed here
 plugin_requires = [
@@ -66,7 +69,13 @@ plugin_ignored_packages = []
 # Example:
 #     plugin_requires = ["someDependency==dev"]
 #     additional_setup_parameters = {"dependency_links": ["https://github.com/someUser/someRepo/archive/master.zip#egg=someDependency-dev"]}
-additional_setup_parameters = {}
+additional_setup_parameters = {
+	"classifiers": [
+		"License :: OSI Approved :: GNU Affero General Public License v3",
+		"Programming Language :: Python :: 3",
+		"Framework :: OctoPrint",
+	]
+}
 
 ########################################################################################################################
 

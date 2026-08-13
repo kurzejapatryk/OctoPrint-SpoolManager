@@ -6,6 +6,11 @@
 
 The OctoPrint-Plugin manages all spool informations and stores it in a database.
 
+> **Note:** This is a maintained fork of the (no longer actively developed)
+> [original project](https://github.com/OllisGit/OctoPrint-SpoolManager) by OllisGit.
+> It focuses on finishing the external (remote) database support so that a single shared
+> database can be used across multiple OctoPrint instances.
+
 #### Support my Efforts
 
 This plugin, as well as my [other plugins](https://github.com/OllisGit/) were developed in my spare time.
@@ -171,4 +176,14 @@ _
 _
 
     docker-compose run postgres bash
+
+## License
+
+This project is licensed under the [GNU Affero General Public License v3.0](LICENSE)
+(SPDX: `AGPL-3.0-only`).
+
+Copyright (c) OllisGit (original author).
+Modifications Copyright (c) 2026 Patryk Kurzeja.
+
+See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for third-party library attributions.
 
