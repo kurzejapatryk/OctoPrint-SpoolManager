@@ -149,15 +149,87 @@ function TableItemHelper(loadItemsFunction, defaultPageSize, defaultSortColumn, 
         self._loadItems();
     }
 
+    self._selectionCoversAll = function(allItems, selectedItems){
+        if (allItems.length === 0) return true;
+        for (var i = 0; i < allItems.length; i++) {
+            if (selectedItems.indexOf(allItems[i]) === -1) return false;
+        }
+        return true;
+    }
+
+    self._selectionCoversAllColors = function(){
+        var selected = self.selectedColorsForFilter();
+        var allColors = self.allColors();
+        for (var i = 0; i < allColors.length; i++) {
+            if (selected.indexOf(allColors[i].colorId) === -1) return false;
+        }
+        return true;
+    }
+
+    self._mergeNewItems = function(allItems, selectedObservable){
+        var selected = selectedObservable();
+        var added = false;
+        for (var i = 0; i < allItems.length; i++) {
+            if (selected.indexOf(allItems[i]) === -1) {
+                selected.push(allItems[i]);
+                added = true;
+            }
+        }
+        if (added) {
+            selectedObservable.valueHasMutated();
+        }
+        return added;
+    }
+
+    self._mergeNewColors = function(){
+        var selected = self.selectedColorsForFilter();
+        var allColors = self.allColors();
+        var added = false;
+        for (var i = 0; i < allColors.length; i++) {
+            if (selected.indexOf(allColors[i].colorId) === -1) {
+                selected.push(allColors[i].colorId);
+                added = true;
+            }
+        }
+        if (added) {
+            self.selectedColorsForFilter.valueHasMutated();
+        }
+        return added;
+    }
+
     self.updateCatalogs = function(catalogs){
         self.allCatalogs = catalogs;
         var materialsCatalog = self.allCatalogs["materials"];
         var vendorsCatalog = self.allCatalogs["vendors"];
         var colorsCatalog = self.allCatalogs["colors"];
 
+        // Remember whether each filter was in "select all" state, so that newly
+        // appearing items (e.g. a spool added with a previously unknown
+        // color/material/vendor, possibly by another OctoPrint instance) are not
+        // silently filtered out of the table.
+        var colorsWereAllSelected = self._selectionCoversAllColors();
+        var materialsWereAllSelected = self._selectionCoversAll(self.allMaterials(), self.selectedMaterialsForFilter());
+        var vendorsWereAllSelected = self._selectionCoversAll(self.allVendors(), self.selectedVendorsForFilter());
+
         self.allMaterials(materialsCatalog);
         self.allVendors(vendorsCatalog);
         self.allColors(colorsCatalog);
+
+        var newItemsAdded = false;
+        if (materialsWereAllSelected) {
+            newItemsAdded = self._mergeNewItems(self.allMaterials(), self.selectedMaterialsForFilter) || newItemsAdded;
+        }
+        if (vendorsWereAllSelected) {
+            newItemsAdded = self._mergeNewItems(self.allVendors(), self.selectedVendorsForFilter) || newItemsAdded;
+        }
+        if (colorsWereAllSelected) {
+            newItemsAdded = self._mergeNewColors() || newItemsAdded;
+        }
+
+        if (newItemsAdded) {
+            // reload the table now that the "select all" state covers the new items
+            self.reloadItems();
+        }
     }
 
     self.paginatedItems = ko.dependentObservable(function() {
