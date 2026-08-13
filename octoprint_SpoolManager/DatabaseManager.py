@@ -147,9 +147,17 @@ class DatabaseManager(object):
 		if not schemeVersionFromDatabase == None:
 			currentDatabaseSchemeVersion = schemeVersionFromDatabase
 			if (currentDatabaseSchemeVersion < CURRENT_DATABASE_SCHEME_VERSION):
-				# auto upgrade done only for local database
+				# auto upgrade is only done for the local SQLite database, because
+				# the migration functions use SQLite-specific SQL
 				if (self._databaseSettings.useExternal == True):
-					self._logger.warn("Scheme upgrade is only done for local database")
+					errorMessage = ("External database scheme version '" + str(currentDatabaseSchemeVersion) +
+									"' does not match the required version '" + str(CURRENT_DATABASE_SCHEME_VERSION) +
+									"'. Use the 'ReCreate database' action in the plugin settings to re-create the "
+									"external database at the correct scheme version (this deletes all data in the "
+									"external database).")
+					self._logger.error(errorMessage)
+					self._storeErrorMessage("error", "database scheme mismatch", errorMessage, False)
+					self._isConnected = False
 					return
 
 				# evautate upgrade steps (from 1-2 , 1...6)
