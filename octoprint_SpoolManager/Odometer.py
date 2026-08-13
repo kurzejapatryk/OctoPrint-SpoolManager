@@ -1,4 +1,7 @@
 # coding=utf-8
+# SPDX-FileCopyrightText: Copyright (c) OllisGit
+# SPDX-FileCopyrightText: Copyright (c) 2026 Patryk Kurzeja
+# SPDX-License-Identifier: AGPL-3.0-only
 # borrowed from FilamentManager
 # master commit hash: bd1a9c0 on 1 Dec 2017
 from __future__ import absolute_import
