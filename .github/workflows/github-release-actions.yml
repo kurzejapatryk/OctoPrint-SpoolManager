@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 Patryk Kurzeja
+# SPDX-License-Identifier: AGPL-3.0-only
 ###
 ### Simple script to build a zip file of the whole repository
 ###
@@ -8,7 +10,7 @@
 #  - Download Zip
 
 name: Build Plugin Release - Action
-on: [push]
+on: workflow_dispatch
 jobs:
   Build-Release-ZIP-Action:
     runs-on: ubuntu-latest
