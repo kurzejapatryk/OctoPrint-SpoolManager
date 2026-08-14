@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - feat: enable PostgreSQL/MySQL drivers and validate database type (f848e7e)
 
 ### Fixed
+- fix: make local/external database detection robust and tighten DB-connection API tests (5e84cbf)
 - fix: restore scheme detection on old (pre-v4) databases (273b91f)
 - fix: portable scheme check via ORM, close leaked connections, pin postgres:16 (623265e)
 - fix: fail explicitly on external database scheme mismatch and surface it in settings UI (2af54d7)
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix: resolve pre-existing TabError (mixed tabs/spaces) in testOdometer.py (523e374)
 
 ### Documentation
+- docs: update changelog [skip ci] (d1cfd6a)
 - docs: update changelog [skip ci] (207a5a8)
 - docs: update changelog [skip ci] (28bea17)
 - docs: finalize project documentation and README; auto-generate changelog (Unreleased) (b0ad9d1)
