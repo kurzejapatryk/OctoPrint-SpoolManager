@@ -8,18 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- feat: add one-time migration for legacy SpoolManager settings and data (0a2fdcb)
 - feat: enable external database configuration section in settings UI (c3c9e4c)
 - feat: enable PostgreSQL/MySQL drivers and validate database type (f848e7e)
-- feat: one-time migration of settings and data on plugin identifier change (`SpoolManager` → `spoolmanager`)
 
 ### Changed
-- refactor: rename plugin identifier to lowercase `spoolmanager` and package to `octoprint_spoolmanager`
-- refactor: rename `SpoolmanagerPlugin` class to `SpoolManagerPlugin`
-- refactor: lowercase all plugin-id URLs, settings keys, tab hashes, event names and template names
-- refactor: unify plugin display name to `SpoolManager`
-- refactor: update metapackage metadata (description, classifiers, pillow pin, python compat)
-- refactor: rename release artifact from `master.zip` to `spoolmanager.zip`
-- chore: author e-mail updated to contact@patrykkurzeja.pl
+- refactor: rename plugin identifier to spoolmanager and package to octoprint_spoolmanager (745ae11)
 
 ### Fixed
 - fix: make local/external database detection robust and tighten DB-connection API tests (5e84cbf)
@@ -30,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix: resolve pre-existing TabError (mixed tabs/spaces) in testOdometer.py (523e374)
 
 ### Documentation
+- docs: update documentation and registration for renamed plugin (4ab56b0)
+- docs: update changelog [skip ci] (dc8fdc6)
 - docs: add Latest Tag and Python version badges to README (17dac47)
 - docs: update changelog [skip ci] (b8b6241)
 - docs: update changelog [skip ci] (d1cfd6a)
@@ -51,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - test: rewrite DatabaseManager tests to run against SQLite/PostgreSQL/MySQL (fe47eee)
 
 ### Other
+- chore: update CI and manifests for renamed package (41cfe39)
 - Merge remote-tracking branch 'origin/development' into development (4ae28af)
 - ci: dev releases as drafts (not prerelease); workflow_dispatch; mark roadmap done (7fd32ac)
 - ci: automatic releases with auto-versioning (master/pre-release/development); drop broken release workflow (fbb5ab7)
