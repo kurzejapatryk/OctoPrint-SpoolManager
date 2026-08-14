@@ -155,7 +155,7 @@ The project is being modernized incrementally.
 - [x] Document existing architecture
 - [x] Improve backend test coverage
 - [x] Add database migration tests
-- [ ] Add API regression tests
+- [x] Add API regression tests
 - [x] Establish GitHub Actions CI
 - [x] Establish automated plugin builds
 

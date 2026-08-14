@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - test: cover v3 to v7 schema migration path (eff4b68)
 - test: add unit tests for api/Transformer (b6242bc)
 - test: rewrite DatabaseManager tests to run against SQLite/PostgreSQL/MySQL (fe47eee)
+- test: add API regression tests for REST endpoints (test_API.py)
 
 ### Other
 - ci: dev releases as drafts (not prerelease); workflow_dispatch; mark roadmap done (7fd32ac)
