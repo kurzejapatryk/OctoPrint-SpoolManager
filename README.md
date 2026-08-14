@@ -1,8 +1,8 @@
 # OctoPrint-SpoolManager
 
-[![Version](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=version&url=https://api.github.com/repos/OllisGit/OctoPrint-SpoolManager/releases&query=$[0].name)]()
-[![Released](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=released&url=https://api.github.com/repos/OllisGit/OctoPrint-SpoolManager/releases&query=$[0].published_at)]()
-![GitHub Releases (by Release)](https://img.shields.io/github/downloads/OllisGit/OctoPrint-SpoolManager/latest/total.svg)
+[![Version](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=version&url=https://api.github.com/repos/kurzejapatryk/OctoPrint-SpoolManager/releases&query=$[0].name)]()
+[![Released](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=released&url=https://api.github.com/repos/kurzejapatryk/OctoPrint-SpoolManager/releases&query=$[0].published_at)]()
+![GitHub Releases (by Release)](https://img.shields.io/github/downloads/kurzejapatryk/OctoPrint-SpoolManager/latest/total.svg)
 
 The OctoPrint-Plugin manages all spool informations and stores it in a database.
 
@@ -13,7 +13,7 @@ The OctoPrint-Plugin manages all spool informations and stores it in a database.
 
 #### Support my Efforts
 
-This plugin, as well as my [other plugins](https://github.com/OllisGit/) were developed in my spare time.
+This plugin was developed in my spare time.
 If you like it, I would be thankful about a cup of coffee :)
 
 [![More coffee, more code](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6SW5R6ZUKLB5E&source=url)
@@ -50,7 +50,7 @@ If you like it, I would be thankful about a cup of coffee :)
 - [X] External Database (PostgreSQL / MySQL / MariaDB)
 - [ ] PrintJobHistory integration [PrintJobHistory-Plugin](https://github.com/OllisGit/OctoPrint-PrintJobHistory)
 - [ ] Capture Spool-Image
-- [ ] ...more planing details could be found [here](https://github.com/OllisGit/OctoPrint-SpoolManager/projects/1)
+- [ ] ...more planning details could be found [here](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/issues)
 
 ## Screenshots
 <!---
@@ -68,7 +68,7 @@ If you like it, I would be thankful about a cup of coffee :)
 Install via the bundled [Plugin Manager](http://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html)
 or manually using this URL:
 
-    https://github.com/OllisGit/OctoPrint-SpoolManager/releases/latest/download/master.zip
+    https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases/latest/download/master.zip
 
 After installation, you can listen on three release channels (since 1.6.0).
 What does this mean: Each channel has its own release-version and each release has a different kind of functionality and stability.
@@ -123,7 +123,7 @@ Supported backends:
 
 ## Versions
 
-see [Release-Overview](https://github.com/OllisGit/OctoPrint-SpoolManager/releases/)
+see [Release-Overview](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases/)
 
 
 ---
