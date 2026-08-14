@@ -46,13 +46,13 @@ $("#colorFilter").select2({
 
 $(function() {
 
-    var PLUGIN_ID = "SpoolManager"; // from setup.py plugin_identifier
+    var PLUGIN_ID = "spoolmanager"; // from setup.py plugin_identifier
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////// VIEW MODEL
     function SpoolManagerViewModel(parameters) {
 
-        var PLUGIN_ID = "SpoolManager"; // from setup.py plugin_identifier
+        var PLUGIN_ID = "spoolmanager"; // from setup.py plugin_identifier
 
         var self = this;
 
@@ -371,7 +371,7 @@ $(function() {
 
         // QR-Code stuff
         self.generateQRCodeTestLink = function(){
-            var source = self.pluginSettings.qrCodeURLPrefix() + "/plugin/SpoolManager/selectSpoolByQRCode/qrPreviewId";
+            var source = self.pluginSettings.qrCodeURLPrefix() + "/plugin/spoolmanager/selectSpoolByQRCode/qrPreviewId";
             var title = "This link is used for the QR-Code";
             return {
                 href: source,
@@ -450,7 +450,7 @@ $(function() {
                         var element = '<!-- ko if: spoolsWithWeight().length < 1 -->  <span><strong>Required Filament unknown</strong></span><br/> <!-- /ko -->';
                         element += '<!-- ko foreach: spoolsWithWeight --> <span data-bind="text: \'Tool \' + toolIndex + \': \', attr: {title: \'Filament usage for Spool \' + spoolName}"></span><strong data-bind="html: $root.formatSpoolsWithWeight($data)"></strong><br> <!-- /ko -->';
 
-                        element += '<div data-bind="visible: settings.settings.plugins.SpoolManager.extrusionDebuggingEnabled">';
+                        element += '<div data-bind="visible: settings.settings.plugins.spoolmanager.extrusionDebuggingEnabled">';
                         element += '<!-- ko foreach: extrusionValues -->';
                         element += '<div>Extruded Tool <span data-bind="text: $index"></span>: <strong data-bind="text: $data.toFixed(2)"></strong></div>';
                         element += '<!-- /ko -->';
@@ -1145,15 +1145,15 @@ $(function() {
 
         self.onAfterTabChange = function(current, previous){
             // alert("Next:"+next +" Current:"+previous);
-            //if ("#tab_plugin_SpoolManager" == current){
+            //if ("#tab_plugin_spoolmanager" == current){
             // var selectedSpoolId = getUrlParameter("selectedSpoolId");
             // if (selectedSpoolId) {
             //     console.error("Id"+selectedSpoolId);
             // }
             var tabHashCode = window.location.hash;
             // QR-Code-Call: We can only contain -spoolId on the very first page
-            if (tabHashCode.includes("#tab_plugin_SpoolManager-spoolId")){
-                var selectedSpoolId = tabHashCode.replace("-spoolId", "").replace("#tab_plugin_SpoolManager", "");
+            if (tabHashCode.includes("#tab_plugin_spoolmanager-spoolId")){
+                var selectedSpoolId = tabHashCode.replace("-spoolId", "").replace("#tab_plugin_spoolmanager", "");
                 selectedSpoolId = parseInt(selectedSpoolId);
                 console.info('Loading spool: '+selectedSpoolId);
                 var alreadyInTool = self.getSpoolItemSelectedTool(selectedSpoolId);
@@ -1172,7 +1172,7 @@ $(function() {
                 var toolIndex = 0
                 self.apiClient.callSelectSpool(0, selectedSpoolId, commitCurrentSpoolValues, function(responseData){
                     //Select the SpoolManager tab
-                    $('a[href="#tab_plugin_SpoolManager"]').tab('show')
+                    $('a[href="#tab_plugin_spoolmanager"]').tab('show')
                     var spoolItem = null;
                     var spoolData = responseData["selectedSpool"];
                     if (spoolData != null){
@@ -1202,7 +1202,7 @@ $(function() {
             "filesViewModel",
             "printerProfilesViewModel"
         ],
-        // Elements to bind to, e.g. #settings_plugin_SpoolManager, #tab_plugin_SpoolManager, ...
+        // Elements to bind to, e.g. #settings_plugin_SpoolManager, #tab_plugin_spoolmanager, ...
         elements: [
             document.getElementById("settings_spoolmanager"),
             document.getElementById("tab_spoolOverview"),

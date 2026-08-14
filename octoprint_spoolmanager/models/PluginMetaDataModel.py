@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 from __future__ import absolute_import
 
-from octoprint_SpoolManager.models.BaseModel import BaseModel
+from octoprint_spoolmanager.models.BaseModel import BaseModel
 from peewee import CharField, Model, DecimalField, FloatField, DateField, DateTimeField, TextField, ForeignKeyField
 
 

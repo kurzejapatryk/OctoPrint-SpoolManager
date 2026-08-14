@@ -10,9 +10,9 @@ import tempfile
 import unittest
 from urllib.parse import urlencode
 
-from octoprint_SpoolManager import SpoolmanagerPlugin
-from octoprint_SpoolManager.DatabaseManager import DatabaseManager
-from octoprint_SpoolManager.models.SpoolModel import SpoolModel
+from octoprint_spoolmanager import SpoolManagerPlugin
+from octoprint_spoolmanager.DatabaseManager import DatabaseManager
+from octoprint_spoolmanager.models.SpoolModel import SpoolModel
 
 
 class _FakeSettings(object):
@@ -63,7 +63,7 @@ class TestSpoolManagerAPI(unittest.TestCase):
 		self._db = DatabaseManager(self._logger, sqlLoggingEnabled=False)
 		self._db.initDatabase(settings, self._clientOutput)
 
-		self._plugin = SpoolmanagerPlugin()
+		self._plugin = SpoolManagerPlugin()
 		self._plugin._logger = self._logger
 		self._plugin._databaseManager = self._db
 		self._plugin._settings = _FakeSettings()
@@ -96,7 +96,7 @@ class TestSpoolManagerAPI(unittest.TestCase):
 	def _build_app(self):
 		app = flask.Flask(__name__)
 		app.testing = True
-		bp = flask.Blueprint("SpoolManager", __name__)
+		bp = flask.Blueprint("spoolmanager", __name__)
 		bp.add_url_rule("/loadSpoolsByQuery", endpoint="loadSpoolsByQuery",
 						view_func=self._plugin.loadAllSpoolsByQuery, methods=["GET"])
 		bp.add_url_rule("/saveSpool", endpoint="saveSpool",
@@ -113,7 +113,7 @@ class TestSpoolManagerAPI(unittest.TestCase):
 						view_func=self._plugin.loadDatabaseMetaData, methods=["GET"])
 		bp.add_url_rule("/testDatabaseConnection", endpoint="testDatabaseConnection",
 						view_func=self._plugin.testDatabaseConnection, methods=["PUT"])
-		app.register_blueprint(bp, url_prefix="/plugin/SpoolManager")
+		app.register_blueprint(bp, url_prefix="/plugin/spoolmanager")
 		return app
 
 	def _seed_spool(self, **overrides):
@@ -146,7 +146,7 @@ class TestSpoolManagerAPI(unittest.TestCase):
 			"selectedPageSize": "10",
 		}
 		params.update({k: str(v) for k, v in overrides.items()})
-		return "/plugin/SpoolManager/loadSpoolsByQuery?" + urlencode(params)
+		return "/plugin/spoolmanager/loadSpoolsByQuery?" + urlencode(params)
 	# ------------------------------------------------------------------ contract
 	def test_load_spools_by_query_shape(self):
 		self._seed_spool()
@@ -164,7 +164,7 @@ class TestSpoolManagerAPI(unittest.TestCase):
 
 	def test_save_spool_creates_and_fires_event(self):
 		before = self._db.countSpoolsByQuery()
-		resp = self.client.put("/plugin/SpoolManager/saveSpool", json={
+		resp = self.client.put("/plugin/spoolmanager/saveSpool", json={
 			"displayName": "New Spool",
 			"material": "PETG",
 			"isActive": True,
@@ -176,7 +176,7 @@ class TestSpoolManagerAPI(unittest.TestCase):
 	def test_delete_spool_fires_event(self):
 		spool = self._seed_spool()
 		databaseId = spool.databaseId
-		resp = self.client.delete("/plugin/SpoolManager/deleteSpool/%d" % databaseId)
+		resp = self.client.delete("/plugin/spoolmanager/deleteSpool/%d" % databaseId)
 		self.assertEqual(resp.status_code, 200)
 		self.assertEqual(self._db.loadSpool(databaseId), None)
 		self.assertIn("spool_deleted", [key for key, _ in self.events])
@@ -184,7 +184,7 @@ class TestSpoolManagerAPI(unittest.TestCase):
 	def test_select_spool_ok(self):
 		spool = self._seed_spool()
 		self._plugin._selectSpool = lambda toolIndex, databaseId: spool
-		resp = self.client.put("/plugin/SpoolManager/selectSpool", json={
+		resp = self.client.put("/plugin/spoolmanager/selectSpool", json={
 			"databaseId": spool.databaseId,
 			"toolIndex": 0,
 		})
@@ -195,14 +195,14 @@ class TestSpoolManagerAPI(unittest.TestCase):
 
 	def test_select_spool_mid_print_409(self):
 		self._plugin._printer = _FakePrinter(printing=True)
-		resp = self.client.put("/plugin/SpoolManager/selectSpool", json={
+		resp = self.client.put("/plugin/spoolmanager/selectSpool", json={
 			"databaseId": 1,
 			"toolIndex": 0,
 		})
 		self.assertEqual(resp.status_code, 409)
 
 	def test_allowed_to_print_shape(self):
-		resp = self.client.get("/plugin/SpoolManager/allowedToPrint")
+		resp = self.client.get("/plugin/spoolmanager/allowedToPrint")
 		self.assertEqual(resp.status_code, 200)
 		data = resp.get_json()
 		self.assertEqual(set(data["result"].keys()),
@@ -210,13 +210,13 @@ class TestSpoolManagerAPI(unittest.TestCase):
 		self.assertIn("metaOrAttributesMissing", data)
 
 	def test_start_print_confirmed(self):
-		resp = self.client.get("/plugin/SpoolManager/startPrintConfirmed")
+		resp = self.client.get("/plugin/spoolmanager/startPrintConfirmed")
 		self.assertEqual(resp.status_code, 200)
 		self.assertEqual(resp.get_json(), {"result": "goForIt"})
 
 	# ------------------------------------------------------------------ DB meta
 	def test_load_database_meta_data(self):
-		resp = self.client.get("/plugin/SpoolManager/loadDatabaseMetaData")
+		resp = self.client.get("/plugin/spoolmanager/loadDatabaseMetaData")
 		self.assertEqual(resp.status_code, 200)
 		data = resp.get_json()
 		self.assertIn("metadata", data)
@@ -224,7 +224,7 @@ class TestSpoolManagerAPI(unittest.TestCase):
 		self.assertEqual(data["metadata"]["localSchemeVersionFromDatabaseModel"], "7")
 
 	def test_test_database_connection(self):
-		resp = self.client.put("/plugin/SpoolManager/testDatabaseConnection", json={"useExternal": False})
+		resp = self.client.put("/plugin/spoolmanager/testDatabaseConnection", json={"useExternal": False})
 		self.assertEqual(resp.status_code, 200)
 		data = resp.get_json()
 		self.assertIn("metadata", data)

@@ -11,17 +11,17 @@ import logging
 import shutil
 import sqlite3
 
-from octoprint_SpoolManager.WrappedLoggingHandler import WrappedLoggingHandler
+from octoprint_spoolmanager.WrappedLoggingHandler import WrappedLoggingHandler
 from peewee import *
 
-from octoprint_SpoolManager.api import Transformer
-from octoprint_SpoolManager.common import StringUtils
-from octoprint_SpoolManager.models.BaseModel import BaseModel
-from octoprint_SpoolManager.models.PluginMetaDataModel import PluginMetaDataModel
-from octoprint_SpoolManager.models.SpoolModel import SpoolModel
+from octoprint_spoolmanager.api import Transformer
+from octoprint_spoolmanager.common import StringUtils
+from octoprint_spoolmanager.models.BaseModel import BaseModel
+from octoprint_spoolmanager.models.PluginMetaDataModel import PluginMetaDataModel
+from octoprint_spoolmanager.models.SpoolModel import SpoolModel
 
-# from octoprint_SpoolManager.models.MaterialModel import MaterialModel
-# from octoprint_SpoolManager.models.MaterialCharacteristicModel import MaterialCharacteristicModel
+# from octoprint_spoolmanager.models.MaterialModel import MaterialModel
+# from octoprint_spoolmanager.models.MaterialCharacteristicModel import MaterialCharacteristicModel
 
 FORCE_CREATE_TABLES = False
 

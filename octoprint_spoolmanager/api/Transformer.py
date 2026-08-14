@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 from __future__ import absolute_import
 
-from octoprint_SpoolManager.models.SpoolModel import SpoolModel
-from octoprint_SpoolManager.common import StringUtils
+from octoprint_spoolmanager.models.SpoolModel import SpoolModel
+from octoprint_spoolmanager.common import StringUtils
 
 def calculateRemainingWeight(usedWeight, totalWeight):
 	if (usedWeight == None or totalWeight == None):

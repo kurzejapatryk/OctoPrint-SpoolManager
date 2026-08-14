@@ -5,6 +5,8 @@
 from __future__ import absolute_import
 
 import math
+import os
+import shutil
 from datetime import datetime
 import flask
 import octoprint.plugin
@@ -12,18 +14,18 @@ from flask import request
 from octoprint.events import Events
 from octoprint.util.comm import MachineCom
 
-from octoprint_SpoolManager.DatabaseManager import DatabaseManager
-# from octoprint_SpoolManager.Odometer import FilamentOdometer
+from octoprint_spoolmanager.DatabaseManager import DatabaseManager
+# from octoprint_spoolmanager.Odometer import FilamentOdometer
 
-from octoprint_SpoolManager.newodometer import NewFilamentOdometer
+from octoprint_spoolmanager.newodometer import NewFilamentOdometer
 
-from octoprint_SpoolManager.api import Transformer
-from octoprint_SpoolManager.api.SpoolManagerAPI import SpoolManagerAPI
-from octoprint_SpoolManager.common import StringUtils
-from octoprint_SpoolManager.common.SettingsKeys import SettingsKeys
-from octoprint_SpoolManager.common.EventBusKeys import EventBusKeys
+from octoprint_spoolmanager.api import Transformer
+from octoprint_spoolmanager.api.SpoolManagerAPI import SpoolManagerAPI
+from octoprint_spoolmanager.common import StringUtils
+from octoprint_spoolmanager.common.SettingsKeys import SettingsKeys
+from octoprint_spoolmanager.common.EventBusKeys import EventBusKeys
 
-class SpoolmanagerPlugin(
+class SpoolManagerPlugin(
 							SpoolManagerAPI,
 							octoprint.plugin.SimpleApiPlugin,
 							octoprint.plugin.SettingsPlugin,
@@ -651,8 +653,72 @@ class SpoolmanagerPlugin(
 	######################################################################################### Hooks and public functions
 
 	def on_after_startup(self):
+		# migrate data from the legacy plugin identifier ("SpoolManager") to the
+		# lowercase identifier ("spoolmanager") - runs only once, on first startup
+		self._migrateLegacyData()
+
 		# check if needed plugins were available
 		self._checkForMissingPluginInfos()
+		pass
+
+	def _migrateLegacyData(self):
+		"""
+		One-time migration for installations that used the old plugin identifier
+		``SpoolManager`` (with uppercase letters). OctoPrint stores settings under
+		``plugins.<identifier>`` and plugin data under ``<base>/data/<identifier>``.
+		After this change the identifier is ``spoolmanager`` (all lowercase), so
+		any existing settings and files need to be moved over to the new location.
+		This is intentionally safe to run: it only does anything if the old data
+		exists and the new location is still empty, and never overwrites anything.
+		"""
+		# --- settings: plugins.SpoolManager -> plugins.spoolmanager
+		old_settings = self._settings.global_get(["plugins", "SpoolManager"])
+		new_settings = self._settings.global_get(["plugins", "spoolmanager"])
+
+		if old_settings is not None and new_settings is None:
+			self._logger.info("Migrating plugin settings from 'plugins.SpoolManager' to 'plugins.spoolmanager'")
+			self._settings.global_set(["plugins", "spoolmanager"], old_settings)
+			self._settings.global_remove(["plugins", "SpoolManager"])
+			self._settings.save()
+		elif old_settings is not None:
+			self._logger.info(
+				"Legacy settings found under 'plugins.SpoolManager' but 'plugins.spoolmanager' already exists - skipping settings migration"
+			)
+
+		# --- data folder: data/SpoolManager -> data/spoolmanager
+		new_data_folder = self.get_plugin_data_folder()
+		old_data_folder = os.path.join(os.path.dirname(new_data_folder), "SpoolManager")
+
+		# fall back to a couple of well-known legacy locations if the parent
+		# computation above did not resolve nicely
+		if not os.path.isdir(old_data_folder):
+			base = os.path.dirname(new_data_folder)
+			for candidate in ("SpoolManager", "spoolmanager"):
+				path = os.path.join(base, candidate)
+				if os.path.isdir(path) and os.path.abspath(path) != os.path.abspath(new_data_folder):
+					old_data_folder = path
+					break
+
+		if os.path.isdir(old_data_folder) and os.path.abspath(old_data_folder) != os.path.abspath(new_data_folder):
+			if not os.path.isdir(new_data_folder):
+				os.makedirs(new_data_folder)
+
+			# only migrate if the new folder is effectively empty
+			if not os.listdir(new_data_folder):
+				self._logger.info("Migrating plugin data from '%s' to '%s'" % (old_data_folder, new_data_folder))
+				for entry in os.listdir(old_data_folder):
+					src = os.path.join(old_data_folder, entry)
+					dst = os.path.join(new_data_folder, entry)
+					if os.path.isdir(src):
+						shutil.copytree(src, dst)
+					else:
+						shutil.copy2(src, dst)
+				self._logger.info("Migration of plugin data completed")
+			else:
+				self._logger.info(
+					"Legacy plugin data found in '%s' but '%s' is not empty - skipping data migration"
+					% (old_data_folder, new_data_folder)
+				)
 		pass
 
 	# Listen to all  g-code which where already sent to the printer (thread: comm.sending_thread)
@@ -842,8 +908,8 @@ class SpoolmanagerPlugin(
 	##~~ TemplatePlugin mixin
 	def get_template_configs(self):
 		return [
-			dict(type="tab", name="Spools"),
-			dict(type="settings", custom_bindings=True, name="Spool Manager")
+			dict(type="tab", name="Spools", template="spoolmanager_tab.jinja2"),
+			dict(type="settings", custom_bindings=True, name="Spool Manager", template="spoolmanager_settings.jinja2")
 		]
 
 	##~~ AssetPlugin mixin
@@ -885,8 +951,8 @@ class SpoolmanagerPlugin(
 		# Plugin here. See https://github.com/foosel/OctoPrint/wiki/Plugin:-Software-Update
 		# for details.
 		return dict(
-			SpoolManager=dict(
-				displayName="SpoolManager Plugin",
+			spoolmanager=dict(
+				displayName="SpoolManager",
 				displayVersion=self._plugin_version,
 
 				# version check: github repository
@@ -915,7 +981,7 @@ class SpoolmanagerPlugin(
 				],
 
 				# update method: pip
-				pip="https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases/download/{target_version}/master.zip"
+				pip="https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases/download/{target_version}/spoolmanager.zip"
 			)
 		)
 
@@ -942,12 +1008,12 @@ class SpoolmanagerPlugin(
 # If you want your plugin to be registered within OctoPrint under a different name than what you defined in setup.py
 # ("OctoPrint-PluginSkeleton"), you may define that here. Same goes for the other metadata derived from setup.py that
 # can be overwritten via __plugin_xyz__ control properties. See the documentation for that.
-__plugin_name__ = "SpoolManager Plugin"
-__plugin_pythoncompat__ = ">=2.7,<4"
+__plugin_name__ = "SpoolManager"
+__plugin_pythoncompat__ = ">=3.8,<4"
 
 def __plugin_load__():
 	global __plugin_implementation__
-	__plugin_implementation__ = SpoolmanagerPlugin()
+	__plugin_implementation__ = SpoolManagerPlugin()
 
 	global __plugin_hooks__
 	__plugin_hooks__ = {

@@ -6,8 +6,8 @@
 import datetime
 import unittest
 
-from octoprint_SpoolManager.api import Transformer
-from octoprint_SpoolManager.models.SpoolModel import SpoolModel
+from octoprint_spoolmanager.api import Transformer
+from octoprint_spoolmanager.models.SpoolModel import SpoolModel
 
 
 def _build_spool(**overrides):

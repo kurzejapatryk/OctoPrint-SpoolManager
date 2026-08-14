@@ -6,29 +6,28 @@
 ########################################################################################################################
 ### Do not forget to adjust the following variables to your own plugin.
 
-# The plugin's identifier, has to be unique
-plugin_identifier = "SpoolManager"
+# The plugin's identifier, has to be unique. Must be all lowercase.
+plugin_identifier = "spoolmanager"
 
 # The plugin's python package, should be "octoprint_<plugin identifier>", has to be unique
-plugin_package = "octoprint_SpoolManager"
+plugin_package = "octoprint_spoolmanager"
 
 # The plugin's human readable name. Can be overwritten within OctoPrint's internal data via __plugin_name__ in the
 # plugin module
-plugin_name = "OctoPrint-SpoolManager"
+plugin_name = "SpoolManager"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
-#
 plugin_version = "1.7.1"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
-plugin_description = """Plugin to manage Spools"""
+plugin_description = "Advanced spool and filament management for OctoPrint."
 
 # The plugin's author. Can be overwritten within OctoPrint's internal data via __plugin_author__ in the plugin module
 plugin_author = "Patryk Kurzeja"
 
 # The plugin's author's mail address.
-plugin_author_email = "patryk@kmpk.eu"
+plugin_author_email = "contact@patrykkurzeja.pl"
 
 # The plugin's homepage URL. Can be overwritten within OctoPrint's internal data via __plugin_url__ in the plugin module
 plugin_url = "https://github.com/kurzejapatryk/OctoPrint-SpoolManager"
@@ -38,7 +37,7 @@ plugin_license = "AGPL-3.0-only"
 
 # Any additional requirements besides OctoPrint should be listed here
 plugin_requires = [
-	"pillow >=6.2.0<7.0.0", # since 7.0.0 no Python 2.7 Support, see https://github.com/python-pillow/Pillow/blob/master/CHANGES.rst
+	"pillow>=9.0.0",
 	"qrcode",
 	"peewee",
 	"psycopg2-binary",  # postgres - driver
@@ -73,7 +72,9 @@ additional_setup_parameters = {
 	"classifiers": [
 		"License :: OSI Approved :: GNU Affero General Public License v3",
 		"Programming Language :: Python :: 3",
+		"Programming Language :: Python :: 3.11",
 		"Framework :: OctoPrint",
+		"Topic :: Printing",
 	]
 }
 

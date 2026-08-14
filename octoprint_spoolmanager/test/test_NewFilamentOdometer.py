@@ -5,7 +5,7 @@
 
 import unittest
 
-from octoprint_SpoolManager.newodometer import NewFilamentOdometer
+from octoprint_spoolmanager.newodometer import NewFilamentOdometer
 
 
 class TestNewFilamentOdometer(unittest.TestCase):

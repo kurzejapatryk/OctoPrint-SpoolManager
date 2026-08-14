@@ -9,8 +9,8 @@ import shutil
 import tempfile
 import unittest
 
-from octoprint_SpoolManager.DatabaseManager import DatabaseManager
-from octoprint_SpoolManager.models.SpoolModel import SpoolModel
+from octoprint_spoolmanager.DatabaseManager import DatabaseManager
+from octoprint_spoolmanager.models.SpoolModel import SpoolModel
 
 
 def _env(key, default=None):

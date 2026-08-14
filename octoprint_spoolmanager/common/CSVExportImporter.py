@@ -10,8 +10,8 @@ import datetime
 import os
 import re
 
-from octoprint_SpoolManager.common import StringUtils
-from octoprint_SpoolManager.models.SpoolModel import SpoolModel
+from octoprint_spoolmanager.common import StringUtils
+from octoprint_spoolmanager.models.SpoolModel import SpoolModel
 
 FORMAT_DATETIME = "%d.%m.%Y %H:%M"
 FORMAT_DATE = "%d.%m.%Y"

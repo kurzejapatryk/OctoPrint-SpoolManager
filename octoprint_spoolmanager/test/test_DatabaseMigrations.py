@@ -10,7 +10,7 @@ import sqlite3
 import tempfile
 import unittest
 
-from octoprint_SpoolManager.DatabaseManager import DatabaseManager
+from octoprint_spoolmanager.DatabaseManager import DatabaseManager
 
 
 FIXTURE = os.path.join(os.path.dirname(__file__), "spoolmanager_scheme_v3.db")

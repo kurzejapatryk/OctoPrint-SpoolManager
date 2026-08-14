@@ -6,8 +6,8 @@
 import logging
 import unittest
 
-from octoprint_SpoolManager import SpoolmanagerPlugin
-from octoprint_SpoolManager.models.SpoolModel import SpoolModel
+from octoprint_spoolmanager import SpoolManagerPlugin
+from octoprint_spoolmanager.models.SpoolModel import SpoolModel
 
 
 class _FakeOdometer(object):
@@ -33,7 +33,7 @@ class _FakeDatabaseManager(object):
 class TestCommitOdometerData(unittest.TestCase):
 
 	def setUp(self):
-		self.plugin = SpoolmanagerPlugin()
+		self.plugin = SpoolManagerPlugin()
 		self.plugin._logger = logging.getLogger("test")
 		self.events = []
 		self.client_messages = []
