@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix: resolve pre-existing TabError (mixed tabs/spaces) in testOdometer.py (523e374)
 
 ### Documentation
+- docs: update changelog [skip ci] (28bea17)
 - docs: finalize project documentation and README; auto-generate changelog (Unreleased) (b0ad9d1)
 - docs: add architecture documentation (audit-based) (acc0ef1)
 - docs: document external database setup for multi-printer use (a3c6717)
@@ -34,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - test: rewrite DatabaseManager tests to run against SQLite/PostgreSQL/MySQL (fe47eee)
 
 ### Other
+- ci: dev releases as drafts (not prerelease); workflow_dispatch; mark roadmap done (7fd32ac)
 - ci: automatic releases with auto-versioning (master/pre-release/development); drop broken release workflow (fbb5ab7)
 - chore: point plugin metadata and release channels to the fork (v1.7.1) (7136762)
 - ci: add SPDX headers, disable auto-release on push (0c61095)
