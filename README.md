@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/actions/workflows/tests.yml/badge.svg)](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/actions/workflows/tests.yml)
 [![Latest Release](https://img.shields.io/github/v/release/kurzejapatryk/OctoPrint-SpoolManager)](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases)
+[![Latest Tag](https://img.shields.io/github/v/tag/kurzejapatryk/OctoPrint-SpoolManager)](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/tags)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/github/license/kurzejapatryk/OctoPrint-SpoolManager)](LICENSE)
 
 > Advanced spool and filament management for OctoPrint.
