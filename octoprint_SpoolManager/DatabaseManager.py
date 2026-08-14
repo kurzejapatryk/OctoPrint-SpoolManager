@@ -116,12 +116,13 @@ class DatabaseManager(object):
 		schemeVersionFromDatabaseModel = None
 		schemeVersionFromDatabase = None
 		try:
-			# use the ORM instead of raw SQL, so the query stays portable
-			# across SQLite, PostgreSQL and MySQL
-			schemeVersionFromDatabaseModel = PluginMetaDataModel.get_or_none(
-				PluginMetaDataModel.key == PluginMetaDataModel.KEY_DATABASE_SCHEME_VERSION)
-			if (schemeVersionFromDatabaseModel != None):
-				schemeVersionFromDatabase = int(schemeVersionFromDatabaseModel.value)
+			# Query only the 'value' column (not the full model), so this works on
+			# old databases that predate the BaseModel columns (updated/version/originator).
+			# peewee quotes identifiers per-backend, so it is portable (SQLite/PG/MySQL).
+			schemeVersionRow = PluginMetaDataModel.select(PluginMetaDataModel.value).where(
+				PluginMetaDataModel.key == PluginMetaDataModel.KEY_DATABASE_SCHEME_VERSION).tuples().first()
+			if (schemeVersionRow != None):
+				schemeVersionFromDatabase = int(schemeVersionRow[0])
 				self._logger.info("Current databasescheme: " + str(schemeVersionFromDatabase))
 			else:
 				self._logger.warn("Strange, table is found (maybe), but there is no result of the schem version. Try to recreate a new db-scheme")
