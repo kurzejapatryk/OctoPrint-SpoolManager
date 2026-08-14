@@ -6,6 +6,7 @@ name: Release
 on:
   push:
     branches: [master, pre-release, development]
+  workflow_dispatch:
 
 jobs:
   release:
@@ -43,15 +44,17 @@ jobs:
           NEXT_HIGH="${X}.${Y}.${NEXT_Z}"
           BRANCH="${GITHUB_REF#refs/heads/}"
           if [ "$BRANCH" = "master" ]; then
-            TAG="$NEXT_HIGH"; PRERELEASE="false"
+            TAG="$NEXT_HIGH"; PRERELEASE="false"; DRAFT="false"
           elif [ "$BRANCH" = "pre-release" ]; then
             N=$(gh release list --limit 100 --json tagName -q '.[].tagName' | grep -c "^${NEXT_HIGH}rc[0-9]*$" || true)
-            TAG="${NEXT_HIGH}rc$((N+1))"; PRERELEASE="true"
+            TAG="${NEXT_HIGH}rc$((N+1))"; PRERELEASE="true"; DRAFT="false"
           else
-            TAG="${NEXT_HIGH}-dev-${GITHUB_SHA::7}"; PRERELEASE="true"
+            # development: a draft, so it does not clutter the release list
+            TAG="${NEXT_HIGH}-dev-${GITHUB_SHA::7}"; PRERELEASE="false"; DRAFT="true"
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+          echo "draft=$DRAFT" >> "$GITHUB_OUTPUT"
 
       - name: Inline release version into setup.py
         run: |
@@ -66,6 +69,7 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           prerelease: ${{ steps.tag.outputs.prerelease }}
+          draft: ${{ steps.tag.outputs.draft }}
           files: master.zip
           generate_release_notes: true
         env:

@@ -152,12 +152,12 @@ The project is being modernized incrementally.
 
 ### Phase 1 — Stabilization
 
-- [ ] Document existing architecture
-- [ ] Improve backend test coverage
-- [ ] Add database migration tests
+- [x] Document existing architecture
+- [x] Improve backend test coverage
+- [x] Add database migration tests
 - [ ] Add API regression tests
-- [ ] Establish GitHub Actions CI
-- [ ] Establish automated plugin builds
+- [x] Establish GitHub Actions CI
+- [x] Establish automated plugin builds
 
 ### Phase 2 — Frontend modernization
 
