@@ -1,0 +1,72 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 Patryk Kurzeja
+# SPDX-License-Identifier: AGPL-3.0-only
+
+name: Release
+
+on:
+  push:
+    branches: [master, pre-release, development]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read base version from setup.py
+        id: base
+        run: |
+          BASE=$(sed -n 's/.*plugin_version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' setup.py | head -1)
+          [ -n "$BASE" ] || BASE="0.0.0"
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+
+      # Auto-versioning: derive a unique version from existing release tags,
+      # so releases never collide and no manual version bump is needed.
+      - name: Determine release tag (auto-versioning)
+        id: tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BASE="${{ steps.base.outputs.base }}"
+          X="${BASE%%.*}"; REST="${BASE#*.}"; Y="${REST%%.*}"; Z="${REST#*.}"
+          # find the highest stable patch released on this X.Y line
+          MAX_Z=$((Z - 1))
+          while read -r T; do
+            if [[ "$T" =~ ^[0-9]+\.[0-9]+\.([0-9]+)$ ]]; then
+              tz="${BASH_REMATCH[1]}"
+              if (( tz > MAX_Z )); then MAX_Z=$tz; fi
+            fi
+          done < <(gh release list --limit 100 --json tagName -q '.[].tagName')
+          NEXT_Z=$((MAX_Z + 1))
+          NEXT_HIGH="${X}.${Y}.${NEXT_Z}"
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          if [ "$BRANCH" = "master" ]; then
+            TAG="$NEXT_HIGH"; PRERELEASE="false"
+          elif [ "$BRANCH" = "pre-release" ]; then
+            N=$(gh release list --limit 100 --json tagName -q '.[].tagName' | grep -c "^${NEXT_HIGH}rc[0-9]*$" || true)
+            TAG="${NEXT_HIGH}rc$((N+1))"; PRERELEASE="true"
+          else
+            TAG="${NEXT_HIGH}-dev-${GITHUB_SHA::7}"; PRERELEASE="true"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Inline release version into setup.py
+        run: |
+          sed -i "s/^plugin_version *= *\".*\"/plugin_version = \"${{ steps.tag.outputs.tag }}\"/" setup.py
+
+      - name: Build plugin zip (master.zip)
+        run: |
+          zip -r master.zip octoprint_SpoolManager translations README.md LICENSE THIRD_PARTY_NOTICES.md requirements.txt setup.py
+
+      - name: Create release and upload master.zip
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          prerelease: ${{ steps.tag.outputs.prerelease }}
+          files: master.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
