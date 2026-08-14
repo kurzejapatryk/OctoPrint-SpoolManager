@@ -1,224 +1,258 @@
 # OctoPrint-SpoolManager
 
-[![Version](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=version&url=https://api.github.com/repos/kurzejapatryk/OctoPrint-SpoolManager/releases&query=$[0].name)]()
-[![Released](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=released&url=https://api.github.com/repos/kurzejapatryk/OctoPrint-SpoolManager/releases&query=$[0].published_at)]()
-![GitHub Releases (by Release)](https://img.shields.io/github/downloads/kurzejapatryk/OctoPrint-SpoolManager/latest/total.svg)
+[![CI](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/actions/workflows/tests.yml/badge.svg)](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/actions/workflows/tests.yml)
+[![Latest Release](https://img.shields.io/github/v/release/kurzejapatryk/OctoPrint-SpoolManager)](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases)
+[![License](https://img.shields.io/github/license/kurzejapatryk/OctoPrint-SpoolManager)](LICENSE)
 
-The OctoPrint-Plugin manages all spool informations and stores it in a database.
+> Advanced spool and filament management for OctoPrint.
 
-> **Note:** This is a maintained fork of the (no longer actively developed)
-> [original project](https://github.com/OllisGit/OctoPrint-SpoolManager) by OllisGit.
-> It focuses on finishing the external (remote) database support so that a single shared
-> database can be used across multiple OctoPrint instances.
+OctoPrint-SpoolManager manages filament spools and their usage directly inside OctoPrint.
 
-#### Support my Efforts
-
-This plugin was developed in my spare time.
-If you like it, I would be thankful about a cup of coffee :)
-
-[![More coffee, more code](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6SW5R6ZUKLB5E&source=url)
-
-## Tested with:
-- OctoPrint 1.7.2:  with Python 3.7.3
-
-## Included features
-
-### Basic attributes to be captured:
-- [X] Spool basic attributes, like name,  color, material, vendor ...
-- [X] "Used length" and "Remaining weight"
-- [X] Additional notes
-- [X] CSV Export of "Legacy FilamentManager-Database" and SpoolManager
-- [X] CSV Import function
-- [ ] Labels
-
-### UI features
-- [X] Better error-feedback (more then just the "happy-path")
-- [X] List all spools
-- [X] Edit single spool
-- [X] Copy single spool
-- [X] Template spool
-- [X] Sort spool table (Displayname, Last/First use, Remaining)
-- [X] Force to select a spool before printing
-- [X] Warn if not enough filament is present
-- [X] Filter spool table
-- [X] Table column visibility
-- [X] Scan QR/Barcodes of a spool
-- [X] Multi Tool support
-- [X] Support for manual mid-print filament change
-
-## Planning / next features
-- [X] External Database (PostgreSQL / MySQL / MariaDB)
-- [ ] PrintJobHistory integration [PrintJobHistory-Plugin](https://github.com/OllisGit/OctoPrint-PrintJobHistory)
-- [ ] Capture Spool-Image
-- [ ] ...more planning details could be found [here](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/issues)
-
-## Screenshots
-<!---
-![plugin-settings](screenshots/plugin-settings.png "Plugin-Settings")
-![plugin-tab](screenshots/plugin-tab.png "Plugin-Tab")
--->
-![listSpools-tab](screenshots/listSpools-tab.png "ListSpools-Tab")
-![selectSpools-sidebar](screenshots/selectSpool-sidebar.png "SelectSpool-Sidebar")
-![selectSpools-dialog](screenshots/selectSpool-dialog.png "SelectSpool-Dialog")
-![editSpool-dialog](screenshots/editSpool-dialog.png "EditSpool-Dialog")
-
-![scanSpool-dialog](screenshots/scanSpool-dialog.png "ScanSpool-Dialog")
-
-## Setup
-Install via the bundled [Plugin Manager](http://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html)
-or manually using this URL:
-
-    https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases/latest/download/master.zip
-
-After installation, you can listen on three release channels (since 1.6.0).
-What does this mean: Each channel has its own release-version and each release has a different kind of functionality and stability.
-
-- **"Only Release"**: Only stable and tested versions will be shown in the software-update section of OctoPrint
-- **"Release & Candidate"**: Beside the stable release, you can also see the "release-candidates", like '''1.7.0rc3'''.
-  The rc's includde new functionalty/bugfixes and are already tested by the community.. so by YOU ;-)
-- **"Release & Candidate & under Development"**: Beside stable and rc, you will be informed about development versions.
-  A development version like '''1.8.0.dev5``` could include a new (experimental) feature/bugfixs, but it is not fully tested by the community
-
-Changing between each release is done via the "Software Update section" in the settings.
-![release-channels](screenshots/release-channels.png "Release channels")
-
-Hint: "Easy-switching" is possible with OctoPrint-Version 1.8.0 (see https://github.com/OctoPrint/OctoPrint/issues/4238).
-At the meantime you need to uninstall and install the version you like from the selected channel...or stay in one channel ;-)
-
-
-## External Database (shared database for multiple printers)
-
-This fork finishes the external database support so that a single shared database can be used by
-multiple OctoPrint instances.
-
-Supported backends:
-- Local **SQLite** (default) — no configuration needed.
-- **PostgreSQL** — requires the `psycopg2-binary` driver.
-- **MySQL / MariaDB** — requires the `pymysql` driver.
-
-### Setup
-
-1. Run a database server. A ready-made setup for both databases is provided in
-   [`docker-compose.yml`](docker-compose.yml):
-
-   ```
-   docker compose up -d postgres mysql
-   ```
-
-   Default connection settings used by that compose file:
-   - host: `localhost`, port: `5432` (PostgreSQL) / `3306` (MySQL)
-   - database: `spoolmanagerdb`, user: `Olli`, password: `illO`
-
-2. In OctoPrint, open **Settings → Spool Manager → Storage**, select **Use external database**,
-   choose the database type and fill in the connection details, then press **Test connection**.
-
-3. Press **ReCreate database** once to create the schema in the external database.
-
-### Notes for multi-printer setups
-
-- All instances must run the **same plugin version** (the database schema version must match).
-- Every OctoPrint instance points at the same external database; changes made on one printer
-  become visible on the others after pressing **Reload** in the Spool Manager tab.
-- The local SQLite database is **not** shared — only the external database is.
-
-## Versions
-
-see [Release-Overview](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases/)
-
+The plugin keeps track of spool information, remaining material, filament consumption and spool selection during printing.
 
 ---
-# Developer - Section
 
-## Events
-Plugin sends the following custom events to the eventbus like this:
+## 🚧 Project Status
 
-    eventManager().fire(eventKey, eventPayload)
+This project is a **community-maintained fork** of [OllisGit/OctoPrint-SpoolManager](https://github.com/OllisGit/OctoPrint-SpoolManager).
 
-| EventKeys                             |
-| ------------------------------------ |
-| plugin_spoolmanager_spool_weight_updated_after_print |
-| plugin_spoolmanager_spool_selected |
-| plugin_spoolmanager_spool_deselected |
-| plugin_spoolmanager_spool_added |
-| plugin_spoolmanager_spool_deleted |
+The original project was created and maintained by **OllisGit**.
 
-HINT: In combination with the [MQTT Plugin](https://github.com/OctoPrint/OctoPrint-MQTT) you can subscribe e.g. to this topic:
-```
-octoPrint/event/plugin_spoolmanager_spool_deselected
-```
+This fork exists to continue development and modernize the plugin while preserving compatibility with existing installations and user data.
 
+### Current focus
 
-**Payload**
+- Stabilizing the existing codebase
+- Improving test coverage
+- Maintaining compatibility with OctoPrint
+- Modernizing the frontend
+- Migrating the legacy JavaScript frontend to TypeScript
+- Improving the development and release workflow
+- Fixing long-standing bugs and technical debt
 
-_spool_added_, _spool_selected_
-```javascript
- {
-   'databaseId': 23,
-   'toolId': 1,
-   'spoolName':'Fancy Spool',
-   'material':'ABS',
-   'colorName':'dark red',
-   'remainingWeight': 1234
- }
-```
-_spool_deselected_
-```javascript
- {
-   'toolId': 1
- }
-```
-_spool_deleted_
-```javascript
- {
-   'databaseId': 23
- }
-```
-Other Plugins could listen to this events in there python-code like this:
+> The project is currently under active development. Some planned features and migrations are not yet complete.
 
-    eventmanager.subscribe("plugin_spoolmanager_spool_selected", self._myEventListener)
-
-or use `octoprint.plugin.EventHandlerPlugin` with something like this:
-
-    def on_event(self, event, payload):
-        if event == "plugin_spoolmanager_spool_selected":
-            ## do something usefull
 ---
 
-### Used UI-Tools
-* Color-Picker:
-Pick-a-Color https://github.com/lauren/pick-a-color/
-* Color Helper:
-https://github.com/bgrins/TinyColor
-* Date-Picker:
-~~bootstrap-datapicker https://github.com/uxsolutions/bootstrap-datepicker~~
-datepicker https://github.com/fengyuanchen/datepicker
+## ✨ Features
 
-* datetimepicker
- https://github.com/xdan/datetimepicker/tree/2.5.20
-https://www.jqueryscript.net/time-clock/Clean-jQuery-Date-Time-Picker-Plugin-datetimepicker.html
+### Spool management
 
-* Select/Labels
-select2 https://select2.org/
+- Create and edit spools
+- Copy existing spools
+- Create template spools
+- Track material type
+- Track manufacturer/vendor
+- Track color
+- Track remaining weight
+- Track used filament
+- Add notes
+- Import and export spool data
+- Import legacy FilamentManager data
+- CSV import/export
 
-* WYSIWYG - Editor
-quill https://quilljs.com/
+### Printing
 
-------
-    docker-compose up
-_
+- Select a spool before printing
+- Multi-tool support
+- Check whether enough filament remains
+- Track filament consumption after printing
+- Support manual mid-print filament changes
 
-    docker-compose down --volumes
-_
+### User interface
 
-    docker-compose run postgres bash
+- Search and filter spools
+- Sort spool lists
+- Configure visible table columns
+- QR/barcode scanning
+- Detailed spool management dialogs
+- Improved error handling
 
-## License
+---
 
-This project is licensed under the [GNU Affero General Public License v3.0](LICENSE)
-(SPDX: `AGPL-3.0-only`).
+## 🖨️ OctoPrint Integration
 
-Copyright (c) OllisGit (original author).
-Modifications Copyright (c) 2026 Patryk Kurzeja.
+SpoolManager integrates directly with OctoPrint and can react to printing-related events.
 
-See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for third-party library attributions.
+The plugin exposes custom events that other OctoPrint plugins can subscribe to.
 
+Current events include:
+
+- `plugin_spoolmanager_spool_weight_updated_after_print`
+- `plugin_spoolmanager_spool_selected`
+- `plugin_spoolmanager_spool_deselected`
+- `plugin_spoolmanager_spool_added`
+- `plugin_spoolmanager_spool_deleted`
+
+See the [Developer Documentation](docs/DEVELOPMENT.md) for the event payloads and integration details.
+
+---
+
+## 🔌 Integrations
+
+SpoolManager is designed to work together with other OctoPrint plugins.
+
+Known integrations include:
+
+- PrintJobHistory
+- MQTT
+- Other plugins consuming SpoolManager events
+
+Integration compatibility is considered part of the project's API stability.
+
+---
+
+## 📦 Installation
+
+### OctoPrint Plugin Manager
+
+The recommended installation method is the OctoPrint Plugin Manager.
+
+Open:
+
+**Settings → Plugin Manager → Get More**
+
+and search for:
+
+**SpoolManager**
+
+### Manual installation
+
+Stable releases can also be installed from a release archive:
+
+https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases/latest/download/master.zip
+
+> Development versions should not be installed on production OctoPrint instances unless you understand the risks.
+
+---
+
+## 🧪 Development
+
+This project uses automated tests and GitHub Actions to validate changes.
+
+Before submitting a pull request, run the test suite locally:
+
+```bash
+pytest
+```
+
+Additional development commands and environment setup are documented in:
+
+- [Development Guide](docs/DEVELOPMENT.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Contributing](CONTRIBUTING.md)
+
+Every pull request is expected to pass the project's CI checks.
+
+---
+
+## 🛣️ Roadmap
+
+The project is being modernized incrementally.
+
+### Phase 1 — Stabilization
+
+- [ ] Document existing architecture
+- [ ] Improve backend test coverage
+- [ ] Add database migration tests
+- [ ] Add API regression tests
+- [ ] Establish GitHub Actions CI
+- [ ] Establish automated plugin builds
+
+### Phase 2 — Frontend modernization
+
+- [ ] Migrate legacy JavaScript to TypeScript
+- [ ] Introduce typed API contracts
+- [ ] Separate business logic from UI logic
+- [ ] Improve frontend test coverage
+
+### Phase 3 — Modern frontend
+
+- [ ] Introduce Vue 3
+- [ ] Convert existing UI into reusable components
+- [ ] Improve state management
+- [ ] Modernize frontend build tooling
+
+### Phase 4 — Continued modernization
+
+- [ ] Improve database migration system
+- [ ] Improve external database support
+- [ ] Review and modernize integrations
+- [ ] Improve documentation
+
+The roadmap is intentionally incremental. Existing functionality and user data should remain protected during the migration.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome.
+
+Before making significant changes, please open an issue to discuss the proposed change.
+
+For development guidelines, see:
+
+[CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+## 🐛 Bug Reports
+
+If you encounter a problem, please open a [GitHub Issue](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/issues).
+
+When reporting a bug, please include:
+
+- OctoPrint version
+- SpoolManager version
+- Python version
+- operating system
+- relevant logs
+- steps to reproduce the problem
+
+---
+
+## 📜 Original Project
+
+This project is a fork of:
+
+**OctoPrint-SpoolManager by OllisGit**
+
+Original repository:
+
+https://github.com/OllisGit/OctoPrint-SpoolManager
+
+The original project and its contributors are credited and preserved according to its license.
+
+This fork is independently maintained and developed.
+
+---
+
+## ❤️ Support
+
+If you find this project useful, the best way to support it is by:
+
+- reporting bugs
+- improving documentation
+- submitting pull requests
+- testing development releases
+- sharing the project with other OctoPrint users
+
+If financial support is added in the future, it will be listed here.
+
+---
+
+## 📄 License
+
+This project remains under the license of the original project.
+
+See [LICENSE](LICENSE) for details.
+
+---
+
+## 📚 Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Development](docs/DEVELOPMENT.md)
+- [Contributing](CONTRIBUTING.md)
+- [Changelog](CHANGELOG.md)
+- [Releases](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases)
