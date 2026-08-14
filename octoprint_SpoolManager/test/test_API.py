@@ -220,12 +220,16 @@ class TestSpoolManagerAPI(unittest.TestCase):
 		self.assertEqual(resp.status_code, 200)
 		data = resp.get_json()
 		self.assertIn("metadata", data)
+		self.assertIs(data["metadata"]["success"], True)
+		self.assertEqual(data["metadata"]["localSchemeVersionFromDatabaseModel"], "7")
 
 	def test_test_database_connection(self):
-		resp = self.client.put("/plugin/SpoolManager/testDatabaseConnection", json={})
+		resp = self.client.put("/plugin/SpoolManager/testDatabaseConnection", json={"useExternal": False})
 		self.assertEqual(resp.status_code, 200)
 		data = resp.get_json()
 		self.assertIn("metadata", data)
+		self.assertIs(data["metadata"]["success"], True)
+		self.assertEqual(data["metadata"]["localSchemeVersionFromDatabaseModel"], "7")
 
 
 if __name__ == '__main__':

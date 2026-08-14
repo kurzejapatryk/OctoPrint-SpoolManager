@@ -70,7 +70,7 @@ class DatabaseManager(object):
 
 	def _buildDatabaseConnection(self):
 		database = None
-		if (self._databaseSettings.useExternal == False):
+		if (not self._databaseSettings.useExternal):
 			# local database
 			database = SqliteDatabase(self._databaseSettings.fileLocation)
 		else:
@@ -842,11 +842,13 @@ class DatabaseManager(object):
 			databaseSettings.baseFolder = self._databaseSettings.baseFolder
 			databaseSettings.fileLocation = self._databaseSettings.fileLocation
 			self._databaseSettings = databaseSettings
+			localOk = False
 			try:
-				self.connectoToDatabase( sendErrorPopUp=False)
-				localSchemeVersionFromDatabaseModel = PluginMetaDataModel.get(PluginMetaDataModel.key == PluginMetaDataModel.KEY_DATABASE_SCHEME_VERSION).value
-				localSpoolItemCount = self.countSpoolsByQuery()
-				self.closeDatabase()
+				if self.connectoToDatabase(sendErrorPopUp=False):
+					localSchemeVersionFromDatabaseModel = PluginMetaDataModel.get(PluginMetaDataModel.key == PluginMetaDataModel.KEY_DATABASE_SCHEME_VERSION).value
+					localSpoolItemCount = self.countSpoolsByQuery()
+					self.closeDatabase()
+					localOk = True
 			except Exception as e:
 				errorMessage = "local database: " + str(e)
 				self._logger.error("Connecting to local database not possible")
@@ -858,14 +860,19 @@ class DatabaseManager(object):
 
 			# Use orign Databasetype to collect the other meta dtaa (if neeeded)
 			databaseSettings.type = currentDatabaseType
+			externalOk = True
 			if (databaseSettings.useExternal == True):
 				# External DB
 				self._databaseSettings = databaseSettings
-				self.connectoToDatabase(sendErrorPopUp=False)
-				externalSchemeVersionFromDatabaseModel = PluginMetaDataModel.get(PluginMetaDataModel.key == PluginMetaDataModel.KEY_DATABASE_SCHEME_VERSION).value
-				externalSpoolItemCount = self.countSpoolsByQuery()
-				self.closeDatabase()
-			loadResult = True
+				if self.connectoToDatabase(sendErrorPopUp=False):
+					externalSchemeVersionFromDatabaseModel = PluginMetaDataModel.get(PluginMetaDataModel.key == PluginMetaDataModel.KEY_DATABASE_SCHEME_VERSION).value
+					externalSpoolItemCount = self.countSpoolsByQuery()
+					self.closeDatabase()
+					externalOk = True
+				else:
+					externalOk = False
+
+			loadResult = localOk and (not databaseSettings.useExternal or externalOk)
 		except Exception as e:
 			errorMessage = str(e)
 			self._logger.exception(e)
