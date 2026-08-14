@@ -24,7 +24,7 @@ maintainers of **OctoPrint-SpoolManager**.
 ## Project layout (short)
 
 ```
-octoprint_SpoolManager/
+octoprint_spoolmanager/
   __init__.py                 # plugin entry point, lifecycle, business logic
   DatabaseManager.py           # connections, CRUD, schema migrations
   newodometer.py               # G-code filament odometer parsing
@@ -33,7 +33,7 @@ octoprint_SpoolManager/
   models/                     # peewee models (BaseModel, SpoolModel, ...)
   static/js/                  # legacy KnockoutJS frontend
   templates/                  # Jinja2 UI templates
-octoprint_SpoolManager/test/  # backend unit tests (test_*.py numbering is important)
+octoprint_spoolmanager/test/  # backend unit tests (test_*.py numbering is important)
 test_support/                 # OctoPrint/past stubs to run tests without OctoPrint
 docs/
   ARCHITECTURE.md
@@ -64,13 +64,13 @@ Additional runtime dependencies are declared in `setup.py`. The plugin needs
 
 ## Running the tests
 
-The test suite lives in `octoprint_SpoolManager/test/` and is auto-discovered by
+The test suite lives in `octoprint_spoolmanager/test/` and is auto-discovered by
 the pattern `test_*.py`.
 
 ### Fast local run (SQLite only)
 
 ```bash
-PYTHONPATH=test_support python -m unittest discover -s octoprint_SpoolManager/test -p 'test_*.py'
+PYTHONPATH=test_support python -m unittest discover -s octoprint_spoolmanager/test -p 'test_*.py'
 ```
 
 > `pytest` is the target test runner once the suite is migrated; for now the
@@ -90,7 +90,7 @@ Then run:
 PYTHONPATH=test_support \
 SPOOLMANAGER_TEST_POSTGRES=1 \
 SPOOLMANAGER_TEST_MYSQL=1 \
-python -m unittest discover -s octoprint_SpoolManager/test -p 'test_*.py'
+python -m unittest discover -s octoprint_spoolmanager/test -p 'test_*.py'
 ```
 
 The test configuration is read from environment variables (defaults in
@@ -112,7 +112,7 @@ parentheses):
 | `SPOOLMANAGER_TEST_MYSQL_PASSWORD` | MySQL password           | `illO`        |
 
 > Database migration tests use a fixture database at
-> `octoprint_SpoolManager/test/spoolmanager_scheme_v3.db`. Do not modify it
+> `octoprint_spoolmanager/test/spoolmanager_scheme_v3.db`. Do not modify it
 > without intent — it exercises the v3 → v7 migration path.
 
 ---

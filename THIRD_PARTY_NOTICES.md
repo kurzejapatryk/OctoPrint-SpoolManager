@@ -2,7 +2,7 @@
 
 This project bundles and uses the following third-party libraries, each distributed under its
 own license. The libraries are located under `3rdPartySoftware/`, with runtime copies of their
-assets under `octoprint_SpoolManager/static/`.
+assets under `octoprint_spoolmanager/static/`.
 
 | Library | Path | License | Copyright |
 | ------- | ---- | ------- | --------- |

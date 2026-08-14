@@ -31,7 +31,7 @@ oferuje eksport/import CSV, kody QR, szablony i zewnętrzną bazę danych (wiele
 
 ```
 [OctoPrint host]
-  ├─ SpoolmanagerPlugin (octoprint_SpoolManager/__init__.py)  ← lifecycle, eventy, business logic
+  ├─ SpoolManagerPlugin (octoprint_spoolmanager/__init__.py)  ← lifecycle, eventy, business logic
   │    ├─ SpoolManagerAPI (api/SpoolManagerAPI.py, mixin)     ← endpointy REST
   │    ├─ DatabaseManager (DatabaseManager.py)                ← połączenia + CRUD + migracje (peewee)
   │    │    └─ models (BaseModel, SpoolModel, PluginMetaDataModel)
@@ -47,7 +47,7 @@ oferuje eksport/import CSV, kody QR, szablony i zewnętrzną bazę danych (wiele
 
 ## 3. Przepływ danych (główna pętla)
 
-1. **G-code → drukarka:** hook `octoprint.comm.protocol.gcode.sent` → `SpoolmanagerPlugin.on_sentGCodeHook`
+1. **G-code → drukarka:** hook `octoprint.comm.protocol.gcode.sent` → `SpoolManagerPlugin.on_sentGCodeHook`
    → `NewFilamentOdometer.processGCodeLine()` → akumulacja ekstruzji per narzędzie →
    `_extrusionValuesChanged` → push do klienta (socket).
 2. **Start druku:** event `PRINT_STARTED` → `_on_printJobStarted` → reset odometru, odczyt metadanych
@@ -63,9 +63,9 @@ oferuje eksport/import CSV, kody QR, szablony i zewnętrzną bazę danych (wiele
 
 | Moduł | Odpowiedzialność | Zależności | Linie | Sprzężenie |
 |---|---|---|---|---|
-| `octoprint_SpoolManager/__init__.py` — `SpoolmanagerPlugin` | lifecycle, eventy, logika biznesowa, ustawienia, socket | DatabaseManager, NewFilamentOdometer, SpoolManagerAPI, Transformer, common | 959 | BARDZO WYSOKIE (god-object) |
+| `octoprint_spoolmanager/__init__.py` — `SpoolManagerPlugin` | lifecycle, eventy, logika biznesowa, ustawienia, socket | DatabaseManager, NewFilamentOdometer, SpoolManagerAPI, Transformer, common | 959 | BARDZO WYSOKIE (god-object) |
 | `DatabaseManager.py` — `DatabaseManager` | połączenia (SQLite/PG/MySQL), schemat, migracje, CRUD, katalogi, backup | peewee (star import), models, Transformer, StringUtils | 1180 | WYSOKIE (god-object) |
-| `api/SpoolManagerAPI.py` — `SpoolManagerAPI` | wszystkie endpointy REST, mapowanie JSON↔model, import CSV (async), QR | BlueprintPlugin, DatabaseManager, models, Transformer, CSVExportImporter, SettingsKeys, EventBusKeys | 1009 | WYSOKIE (mixin zależny od `SpoolmanagerPlugin`) |
+| `api/SpoolManagerAPI.py` — `SpoolManagerAPI` | wszystkie endpointy REST, mapowanie JSON↔model, import CSV (async), QR | BlueprintPlugin, DatabaseManager, models, Transformer, CSVExportImporter, SettingsKeys, EventBusKeys | 1009 | WYSOKIE (mixin zależny od `SpoolManagerPlugin`) |
 | `models/BaseModel.py` | baza modeli: `databaseId`, `created`, `updated`, `version`, `originator`; `table_function` → prefiks `spo_` | peewee | 32 | Niskie |
 | `models/SpoolModel.py` | ~40 pól szpuli | BaseModel | 82 | Niskie |
 | `models/PluginMetaDataModel.py` | `key`/`value` (wersja schematu, wersja pluginu) | BaseModel | 17 | Niskie |
@@ -140,7 +140,7 @@ współdzielone między sidebar, dialogiem i tabelą. Naturalny kandydat na Pini
 
 ## 6. API — kontrakt frontend↔backend
 
-Wszystkie endpointy to **publiczny kontrakt**. Baza: `/plugin/SpoolManager/...`.
+Wszystkie endpointy to **publiczny kontrakt**. Baza: `/plugin/spoolmanager/...`.
 
 | Metoda | Ścieżka | Request | Response | Użycie w FE |
 |---|---|---|---|---|
@@ -161,7 +161,7 @@ Wszystkie endpointy to **publiczny kontrakt**. Baza: `/plugin/SpoolManager/...`.
 | GET | `/loadSpoolsByQuery` | query params | {templateSpools, catalogs, totalItemCount, allSpools, selectedSpools} | `callLoadSpoolsByQuery` |
 | PUT | `/saveSpool` | JSON spool (wszystkie pola) | JSON() | `callSaveSpool` |
 | DELETE | `/deleteSpool/<id>` | — | JSON() | `callDeleteSpool` |
-| GET | `api/plugin/SpoolManager?action=…` | resetSettings / isResetSettingsEnabled / additionalSettingsValues | JSON | `callAdditionalSettings`, `ResetSettingsUtilV3` |
+| GET | `api/plugin/spoolmanager?action=…` | resetSettings / isResetSettingsEnabled / additionalSettingsValues | JSON | `callAdditionalSettings`, `ResetSettingsUtilV3` |
 
 **Niezmienialne bez zachowania kompatybilności:** `/loadSpoolsByQuery`, `/saveSpool`, `/selectSpool`,
 `/allowedToPrint`, payloady event bus (`spool_added`, `spool_selected`, …).
@@ -207,7 +207,7 @@ kontrakt JSON API (snapshoty), `commitOdometerData`.
 4. **Ukryta globalna zależność DB:** `DatabaseManager.db` (atrybut klasowy).
 5. **Circular import:** `SpoolManagerAPI.py:21` ↔ `__init__.py:21`.
 6. **Mixin zależny od konkretnej klasy:** `SpoolManagerAPI` używa `self._databaseManager`,
-   `self.loadSelectedSpools`, `self.commitOdometerData`… zdefiniowanych w `SpoolmanagerPlugin`.
+   `self.loadSelectedSpools`, `self.commitOdometerData`… zdefiniowanych w `SpoolManagerPlugin`.
 7. **Ręczne mapowanie JSON** (~40 pól) bez walidacji/schematu (pydantic do rozważenia).
 8. **Star import peewee** (`from peewee import *`).
 9. **Python 2 legacy:** `past`, `from __future__`, `__plugin_pythoncompat__=">=2.7,<4"`, `print` w `newodometer.py:162`.

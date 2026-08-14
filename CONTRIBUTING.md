@@ -65,11 +65,11 @@ Every pull request is expected to pass the CI checks
 
 ## Testing
 
-Tests live in `octoprint_SpoolManager/test/` and are discovered via the
+Tests live in `octoprint_spoolmanager/test/` and are discovered via the
 `test_*.py` pattern. Quick local run (SQLite only):
 
 ```bash
-PYTHONPATH=test_support python -m unittest discover -s octoprint_SpoolManager/test -p 'test_*.py'
+PYTHONPATH=test_support python -m unittest discover -s octoprint_spoolmanager/test -p 'test_*.py'
 ```
 
 For the full database matrix (SQLite + PostgreSQL + MySQL) and environment

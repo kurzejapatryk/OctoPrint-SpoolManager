@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - feat: enable external database configuration section in settings UI (c3c9e4c)
 - feat: enable PostgreSQL/MySQL drivers and validate database type (f848e7e)
+- feat: one-time migration of settings and data on plugin identifier change (`SpoolManager` → `spoolmanager`)
+
+### Changed
+- refactor: rename plugin identifier to lowercase `spoolmanager` and package to `octoprint_spoolmanager`
+- refactor: rename `SpoolmanagerPlugin` class to `SpoolManagerPlugin`
+- refactor: lowercase all plugin-id URLs, settings keys, tab hashes, event names and template names
+- refactor: unify plugin display name to `SpoolManager`
+- refactor: update metapackage metadata (description, classifiers, pillow pin, python compat)
+- refactor: rename release artifact from `master.zip` to `spoolmanager.zip`
+- chore: author e-mail updated to contact@patrykkurzeja.pl
 
 ### Fixed
 - fix: make local/external database detection robust and tighten DB-connection API tests (5e84cbf)

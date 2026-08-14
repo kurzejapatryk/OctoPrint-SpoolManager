@@ -1,81 +1,42 @@
 ---
 layout: plugin
 
-id: SpoolManager
-title: OctoPrint-SpoolManager
-description: Plugin to manage Spools
+id: spoolmanager
+title: SpoolManager
+description: Advanced spool and filament management for OctoPrint.
 author: Patryk Kurzeja
-license: AGPLv3
+license: AGPL-3.0-only
 
-# TODO
-date: today's date in format YYYY-MM-DD, e.g. 2015-04-21
+homepage: https://github.com/kurzejapatryk/OctoPrint-SpoolManager
+source: https://github.com/kurzejapatryk/OctoPrint-SpoolManager
+archive: https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases/latest/download/spoolmanager.zip
 
-homepage: https://github.com/you/OctoPrint-SpoolManager
-source: https://github.com/you/OctoPrint-SpoolManager
-archive: https://github.com/you/OctoPrint-SpoolManager/archive/master.zip
-
-# TODO
-# Set this to true if your plugin uses the dependency_links setup parameter to include
-# library versions not yet published on PyPi. SHOULD ONLY BE USED IF THERE IS NO OTHER OPTION!
-#follow_dependency_links: false
-
-# TODO
 tags:
-- a list
-- of tags
-- that apply
-- to your plugin
-- (take a look at the existing plugins for what makes sense here)
+- spool
+- filament
+- filament management
+- spool management
+- multi-tool
+- filament usage
+- weight
+- length
+- qr code
+- csv
 
-# TODO
 screenshots:
-- url: url of a screenshot, /assets/img/...
-  alt: alt-text of a screenshot
-  caption: caption of a screenshot
-- url: url of another screenshot, /assets/img/...
-  alt: alt-text of another screenshot
-  caption: caption of another screenshot
-- ...
-
-# TODO
-featuredimage: url of a featured image for your plugin, /assets/img/...
-
-# TODO
-# You only need the following if your plugin requires specific OctoPrint versions or
-# specific operating systems to function - you can safely remove the whole
-# "compatibility" block if this is not the case.
+- url: /assets/img/plugins/spoolmanager/tab.png
+  alt: Spool overview tab
+  caption: Manage spools in a dedicated tab
+- url: /assets/img/plugins/spoolmanager/sidebar.png
+  alt: Spool selection in sidebar
+  caption: Select and track spools from the sidebar
 
 compatibility:
 
-  # List of compatible versions
-  #
-  # A single version number will be interpretated as a minimum version requirement,
-  # e.g. "1.3.1" will show the plugin as compatible to OctoPrint versions 1.3.1 and up.
-  # More sophisticated version requirements can be modelled too by using PEP440
-  # compatible version specifiers.
-  #
-  # You can also remove the whole "octoprint" block. Removing it will default to all
-  # OctoPrint versions being supported.
-
   octoprint:
-  - 1.2.0
+  - 1.8.0
 
-  # List of compatible operating systems
-  #
-  # Valid values:
-  #
-  # - windows
-  # - linux
-  # - macos
-  # - freebsd
-  #
-  # There are also two OS groups defined that get expanded on usage:
-  #
-  # - posix: linux, macos and freebsd
-  # - nix: linux and freebsd
-  #
-  # You can also remove the whole "os" block. Removing it will default to all
-  # operating systems being supported.
+  python: ">=3.8,<4"
 
   os:
   - linux
@@ -85,5 +46,39 @@ compatibility:
 
 ---
 
-**TODO**: Longer description of your plugin, configuration examples etc. This part will be visible on the page at
-http://plugins.octoprint.org/plugin/SpoolManager/
+# SpoolManager
+
+Advanced spool and filament management for OctoPrint.
+
+SpoolManager keeps track of your filament spools inside OctoPrint. You can create
+and edit spools, track remaining material, filament consumption and spool
+selection directly in the OctoPrint UI.
+
+## Features
+
+- Create, edit and copy spools
+- Template spools
+- Track material, vendor, color, weight, length and notes
+- Select a spool per tool (multi-tool support)
+- Check whether enough filament remains before/during a print
+- Track filament consumption after printing
+- QR/barcode scanning
+- Import/export spool data (CSV), including legacy FilamentManager data
+- Custom events for other plugins (e.g. `plugin_spoolmanager_spool_selected`)
+
+## Installation
+
+Install via the OctoPrint Plugin Manager (search for **SpoolManager**) or download
+the latest release archive:
+
+https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases/latest
+
+## Support
+
+Report bugs and feature requests at:
+
+https://github.com/kurzejapatryk/OctoPrint-SpoolManager/issues
+
+## License
+
+AGPL-3.0-only — see [LICENSE](https://github.com/kurzejapatryk/OctoPrint-SpoolManager/blob/master/LICENSE).

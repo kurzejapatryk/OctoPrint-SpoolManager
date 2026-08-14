@@ -122,7 +122,7 @@ and search for:
 
 Stable releases can also be installed from a release archive:
 
-https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases/latest/download/master.zip
+https://github.com/kurzejapatryk/OctoPrint-SpoolManager/releases/latest/download/spoolmanager.zip
 
 > Development versions should not be installed on production OctoPrint instances unless you understand the risks.
 
