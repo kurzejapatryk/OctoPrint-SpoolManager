@@ -1,0 +1,36 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 Patryk Kurzeja
+# SPDX-License-Identifier: AGPL-3.0-only
+
+stages:
+  - test
+
+variables:
+  PYTHONPATH: test_support
+  SPOOLMANAGER_TEST_POSTGRES: "1"
+  SPOOLMANAGER_TEST_MYSQL: "1"
+  # GitLab CI services are reachable by alias (not localhost).
+  SPOOLMANAGER_TEST_PG_HOST: postgres
+  SPOOLMANAGER_TEST_MYSQL_HOST: mysql
+
+tests:
+  image: python:3.11
+  stage: test
+  services:
+    - name: postgres:16
+      alias: postgres
+      variables:
+        POSTGRES_USER: Olli
+        POSTGRES_PASSWORD: illO
+        POSTGRES_DB: spoolmanagerdb
+    - name: mysql:8
+      alias: mysql
+      variables:
+        MYSQL_DATABASE: spoolmanagerdb
+        MYSQL_ROOT_PASSWORD: illO
+        MYSQL_USER: Olli
+        MYSQL_PASSWORD: illO
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install peewee flask qrcode pillow pymysql psycopg2-binary
+  script:
+    - python -m unittest discover -s octoprint_SpoolManager/test -p 'test_*.py'

@@ -1,0 +1,69 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 Patryk Kurzeja
+# SPDX-License-Identifier: AGPL-3.0-only
+
+name: Tests
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+
+jobs:
+  tests:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: Olli
+          POSTGRES_PASSWORD: illO
+          POSTGRES_DB: spoolmanagerdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U Olli -d spoolmanagerdb"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_DATABASE: spoolmanagerdb
+          MYSQL_ROOT_PASSWORD: illO
+          MYSQL_USER: Olli
+          MYSQL_PASSWORD: illO
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install peewee flask qrcode pillow pymysql psycopg2-binary
+
+      - name: Run unit tests (SQLite + PostgreSQL + MySQL)
+        env:
+          PYTHONPATH: test_support
+          SPOOLMANAGER_TEST_POSTGRES: "1"
+          SPOOLMANAGER_TEST_MYSQL: "1"
+        run: |
+          python -m unittest discover -s octoprint_SpoolManager/test -p 'test_*.py'
