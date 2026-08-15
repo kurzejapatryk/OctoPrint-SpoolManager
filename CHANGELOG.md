@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix: resolve pre-existing TabError (mixed tabs/spaces) in testOdometer.py (523e374)
 
 ### Documentation
+- docs: update changelog [skip ci] (36f9e1c)
 - docs: update changelog [skip ci] (ac2ff67)
 - docs: update changelog [skip ci] (f9e56db)
 - docs: update documentation and registration for renamed plugin (4ab56b0)
@@ -49,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - test: rewrite DatabaseManager tests to run against SQLite/PostgreSQL/MySQL (fe47eee)
 
 ### Other
+- ci: count all releases via gh api to avoid overwriting historical releases (2978ec0)
 - ci: count all RC tags via git ls-remote to avoid overwriting historical releases (1bdad71)
 - ci: fix tests workflow branch name (develop -> development) (2fa195f)
 - chore: update CI and manifests for renamed package (41cfe39)
