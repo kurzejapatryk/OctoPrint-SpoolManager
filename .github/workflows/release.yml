@@ -25,10 +25,11 @@ jobs:
 
       # Auto-versioning: derive a unique version from existing release tags,
       # so releases never collide and no manual version bump is needed.
+      # Uses `git ls-remote --tags origin` (not `gh release list`) so that ALL
+      # tags are counted, including historical ones that may not have a
+      # corresponding GitHub Release object.
       - name: Determine release tag (auto-versioning)
         id: tag
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BASE="${{ steps.base.outputs.base }}"
           X="${BASE%%.*}"; REST="${BASE#*.}"; Y="${REST%%.*}"; Z="${REST#*.}"
@@ -39,14 +40,14 @@ jobs:
               tz="${BASH_REMATCH[1]}"
               if (( tz > MAX_Z )); then MAX_Z=$tz; fi
             fi
-          done < <(gh release list --limit 100 --json tagName -q '.[].tagName')
+          done < <(git ls-remote --tags origin | sed 's|.*refs/tags/||' | grep -v '\^{}')
           NEXT_Z=$((MAX_Z + 1))
           NEXT_HIGH="${X}.${Y}.${NEXT_Z}"
           BRANCH="${GITHUB_REF#refs/heads/}"
           if [ "$BRANCH" = "master" ]; then
             TAG="$NEXT_HIGH"; PRERELEASE="false"; DRAFT="false"
           elif [ "$BRANCH" = "pre-release" ]; then
-            N=$(gh release list --limit 100 --json tagName -q '.[].tagName' | grep -c "^${NEXT_HIGH}rc[0-9]*$" || true)
+            N=$(git ls-remote --tags origin "refs/tags/${NEXT_HIGH}rc*" | grep -c "refs/tags/${NEXT_HIGH}rc[0-9]*$" || true)
             TAG="${NEXT_HIGH}rc$((N+1))"; PRERELEASE="true"; DRAFT="false"
           else
             # development: a draft, so it does not clutter the release list
